@@ -5,12 +5,44 @@ import { useStore } from '../stateStores/DetailsStore';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Switch } from 'react-native-paper';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 
 
 const screenHeight = Dimensions.get('window').height;
 
+type FormValues = {
+  categrory: string;
+  subcategory: string;
+  manufacturer: string;
+  model: string;
+  serialNumber: string;
+  modelNumber: string;
+  purchaseDate: string;
+  underWarranty: boolean;
+  warrantyExpirationDate: string;
+  purchasedFrom: string;
+  assignToFloor: string;
+  assignToRoom: string;
+} 
+
+const schema = yup.object().shape({
+
+  categrory: yup.string().required(),
+  subcategory: yup.string().required(),
+  manufacturer: yup.string().required(),
+  model: yup.string().required(),
+  serialNumber: yup.string().required(),
+  modelNumber: yup.string().required(),
+  purchaseDate: yup.string().required(),
+  underWarranty: yup.boolean().required(),
+  warrantyExpirationDate: yup.string().required(),
+  purchasedFrom: yup.string().required(),
+  assignToFloor: yup.string().required(),
+  assignToRoom: yup.string().required(),
+});
 
 const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => {
 
@@ -24,6 +56,40 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
   ]);
+  const [openManufacturer, setOpenManufacturer] = useState(false);
+  const [openModel, setOpenModel] = useState(false);
+  const [openFloor, setOpenFloor] = useState(false);
+  const [openRoom, setOpenRoom] = useState(false);
+  const [valueManufacturer, setValueManufacturer] = useState(null);
+  const [valueModel, setValueModel] = useState(null);
+  const [valueFloor, setValueFloor] = useState(null);
+  const [valueRoom, setValueRoom] = useState(null);
+  const [manufacturer, setManufacturer] = useState([
+    {label: 'Apple', value: 'apple'},
+    {label: 'Banana', value: 'banana'}
+  ]);
+  const [model, setModel] = useState([
+    {label: 'Apple', value: 'apple'},
+    {label: 'Banana', value: 'banana'}
+  ]);
+  const [floor, setFloor] = useState([
+    {label: 'Apple', value: 'apple'},
+    {label: 'Banana', value: 'banana'}
+  ]);
+  const [room, setRoom] = useState([
+    {label: 'Apple', value: 'apple'},
+    {label: 'Banana', value: 'banana'}
+  ]);
+
+  /// form 
+  const { control, handleSubmit, formState } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data: FormValues) => {
+    console.log(data);
+  };
+
   const detailsStore = useStore(state => state);
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
 
@@ -64,7 +130,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
 
   const pickReceiptImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
@@ -96,16 +162,20 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
     animationType="slide"
     transparent={true}
     visible={visible}
+  
   >
     <View style={styles.modalContainer}>
-      <View style={{ backgroundColor: 'white', padding: 20, width: '100%', height: screenHeight * 0.9, zIndex: 2000, position: 'absolute', bottom: 0 }}>
+      <View style={{ backgroundColor: 'white',borderTopLeftRadius: 10, borderTopRightRadius: 10, padding: 20, width: '100%', height: screenHeight * 0.9, zIndex: 2000, position: 'absolute', bottom: 0 }}>
         <View style={{flexDirection: "row", justifyContent: 'space-between',}}>
           <Text onPress={onClose}>X</Text>
-          <Button title="Done" onPress={onClose} />
+          <Button title="Done" onPress={handleSubmit(onSubmit)} />
+          {/* {formState.errors && <Text>This field is required</Text>} */}
 
         </View>
       
         <Text style={styles.categoriesText}>{detailsStore.selectedCategory?.label} {'>'} {detailsStore.selectedSubcategory?.label}</Text>
+        <View style={{height: 1, width: 340,  backgroundColor: 'lightgrey', marginLeft: 'auto', marginRight: 'auto', marginBottom: 10}}/>
+
         <ScrollView showsVerticalScrollIndicator={false}>
         {/* <Button title="Request Permission" onPress={requestPermission}></Button>  
 
@@ -114,12 +184,12 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
          
         </View> */}
 
-        {/* <Text>Add/Replace Images</Text> */}
+        <Text style={{marginBottom: 10, fontSize: 16}}>Add/Replace Images</Text>
         {/* <Button title="Add Image" onPress={onClose} /> */}
       
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30, paddingHorizontal: 10}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, paddingHorizontal: 10}}>
           <View >
-            <Text>Actual Image</Text>
+            <Text style={{marginLeft: 'auto', marginRight: 'auto'}}>Actual Image</Text>
             {actualImage ?
               <Image source={{ uri: actualImage }} style={{ width: 90, height: 100 }} /> 
             : 
@@ -134,7 +204,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
           </View>
 
           <View>
-            <Text>Product Label</Text>
+            <Text style={{marginLeft: 'auto', marginRight: 'auto'}}>Product Label</Text>
             {labelImage ?
             <Image source={{ uri: labelImage }} style={{ width: 90, height: 100 }} />
             :
@@ -148,7 +218,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
          </View>
 
           <View >
-            <Text>Receipt</Text>
+            <Text style={{marginLeft: 'auto', marginRight: 'auto'}}>Receipt</Text>
             {receiptImage ?
              <Image source={{ uri: receiptImage }} style={{ width: 90, height: 100 }} />
              :
@@ -168,21 +238,33 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
         <View style={styles.formContainer}>
         {/* left row */}
           <View style={styles.formColumn}>
-            <Text>Manufacturer</Text>
+            <Text style={{marginBottom: 10, fontSize: 16}}>Manufacturer</Text>
             <View style={{ zIndex: 2000}}>
+            <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
                <DropDownPicker
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
-         
-          
+                open={openManufacturer}
+                value={valueManufacturer}
+                items={manufacturer}
+                setOpen={setOpenManufacturer}
+                setValue={setValueManufacturer}
+                setItems={setManufacturer}
+                style={{borderRadius: 0}}
               />
+              )}
+              name="manufacturer"
+            /> 
             </View>
-            <Text>Serial #</Text>
-            <TextInput style={styles.input}/>
+            <Text style={{marginBottom: 10, fontSize: 16, marginTop: 10}}>Serial #</Text>
+            <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput value={value} onChangeText={onChange} placeholder="Serial Number" style={styles.input}/>
+              )}
+              name="serialNumber"
+            />
+    
             <Text style={styles.formText}>Purchase/Install Date</Text>
             <Text style={styles.formText}>Under Warranty</Text>
             <Text style={styles.formText}>Warranty Expiration Date</Text>
@@ -191,8 +273,8 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
 
       {/* right row */}
          <View style={styles.formColumn}>
-          <Text>Model</Text>
-            <View>
+          <Text style={{marginBottom: 10, fontSize: 16}}>Model</Text>
+            <View style={{ zIndex: 2000}}>
               <DropDownPicker
                 open={open}
                 value={value}
@@ -200,26 +282,93 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
                 setOpen={setOpen}
                 setValue={setValue}
                 setItems={setItems}
+                style={{borderRadius: 0}}
+
               />
               </View>
-               <Text>Model #</Text>
-            <TextInput style={styles.input}/>        
-            <TextInput style={styles.input}/>
+               <Text style={{marginBottom: 10, fontSize: 16, marginTop: 10}}>Model #</Text>
+              <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput value={value} onChangeText={onChange} placeholder="Model Number" style={styles.input}/>  
+              )}
+                name="modelNumber"
+              /> 
+
+                <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput value={value} onChangeText={onChange} placeholder="Purchase Date" style={styles.input}/>  
+              )}
+                name="purchaseDate"
+              /> 
+               <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
             <Switch style={{marginBottom: 10}} value={isSwitchOn} onValueChange={onToggleSwitch} />
-            <TextInput style={styles.input}/>
-            <TextInput style={styles.input}/>
+            )}
+            name="underWarranty"
+            /> 
+            <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput value={value} onChangeText={onChange} placeholder="Expiration Date" style={styles.input}/>  
+              )}
+                name="warrantyExpirationDate"
+              /> 
+                <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput value={value} onChangeText={onChange} placeholder="Purchased From" style={styles.input}/>  
+              )}
+                name="purchasedFrom"
+              /> 
           </View>
 
         </View>
         <View style={{height: 1, width: 340,  backgroundColor: 'lightgrey', marginLeft: 'auto', marginRight: 'auto'}}/>
       <View style={styles.formContainer}>
         <View style={styles.formColumn}>
-          <Text> Assign to Floor</Text>
-          <TextInput style={styles.input}/>
+          <Text style={{marginBottom: 10, fontSize: 16,}}> Assign to Floor</Text>
+          <View style={{ zIndex: 2000}}>
+          <Controller
+        control={control}
+        render={({ field: { onChange, value } }) => (
+               <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                style={{borderRadius: 0}}
+          
+              />
+              )}
+              name="assignToFloor"
+            />
+            </View>
         </View>
         <View style={styles.formColumn}>
-        <Text> Assign to Room</Text>
-          <TextInput style={styles.input}/>
+        <Text style={{marginBottom: 10, fontSize: 16,}}> Assign to Room</Text>
+        <View style={{ zIndex: 2000}}>
+            <Controller
+            control={control}
+            render={({ field: { onChange, value } }) => (
+               <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                style={{borderRadius: 0}}
+          
+              />
+              )}
+              name="assignToRoom"
+            />
+            </View>
         </View>
       </View>
       </ScrollView>
