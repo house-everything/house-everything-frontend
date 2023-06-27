@@ -1,20 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import Navigation from './Navigation'
+import { useFonts } from 'expo-font'
+import { StatusBar } from 'expo-status-bar'
+import { useColorScheme, View, Text } from 'react-native'
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: 'tomato',
+    accent: 'yellow',
+  },
+};
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+    <PaperProvider theme={theme}>
+      
+      <Navigation/>
+    </PaperProvider>
+    </GestureHandlerRootView>
+  )
+
+}
