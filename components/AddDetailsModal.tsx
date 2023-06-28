@@ -14,14 +14,14 @@ import * as yup from 'yup';
 const screenHeight = Dimensions.get('window').height;
 
 type FormValues = {
-  categrory: string;
-  subcategory: string;
-  manufacturer: string;
-  model: string;
+  // categrory: string;
+  // subcategory: string;
+  // manufacturer: string;
+  // model: string;
   serialNumber: string;
   modelNumber: string;
   purchaseDate: string;
-  underWarranty: boolean;
+  // // underWarranty: boolean;
   warrantyExpirationDate: string;
   purchasedFrom: string;
   assignToFloor: string;
@@ -30,20 +30,33 @@ type FormValues = {
 
 const schema = yup.object().shape({
 
-  categrory: yup.string().required(),
-  subcategory: yup.string().required(),
-  manufacturer: yup.string().required(),
-  model: yup.string().required(),
+  // categrory: yup.string().required(),
+  // subcategory: yup.string().required(),
+  // manufacturer: yup.string().required(),
+  // model: yup.string().required(),
   serialNumber: yup.string().required(),
   modelNumber: yup.string().required(),
   purchaseDate: yup.string().required(),
-  underWarranty: yup.boolean().required(),
+  // // underWarranty: yup.boolean().required(),
   warrantyExpirationDate: yup.string().required(),
   purchasedFrom: yup.string().required(),
-  assignToFloor: yup.string().required(),
-  assignToRoom: yup.string().required(),
+  assignToFloor: yup.string(),
+  assignToRoom: yup.string(),
 });
-
+// const defaultValues: FormValues = {
+//   // categrory: '',
+//   // subcategory: '',
+//   // manufacturer: '',
+//   // model: '',
+//   serialNumber: '',
+//   modelNumber: '',
+//   purchaseDate: '',
+//   underWarranty: false,
+//   warrantyExpirationDate: '',
+//   purchasedFrom: '',
+//   assignToFloor: '',
+//   assignToRoom: '',
+// };
 const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => {
 
   const [permission, requestPermission] = ImagePicker.useCameraPermissions();
@@ -82,12 +95,21 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
   ]);
 
   /// form 
-  const { control, handleSubmit, formState } = useForm<FormValues>({
+  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: yupResolver(schema),
   });
 
+  const dropdownData = {
+    // manufacturer: manufacturer,
+    // model: model,
+    floor: valueFloor,
+    room: valueRoom,
+    underWarranty: isSwitchOn
+  }
+
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    console.log({...data,...dropdownData});
+  
   };
 
   const detailsStore = useStore(state => state);
@@ -162,13 +184,15 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
     animationType="slide"
     transparent={true}
     visible={visible}
-  
+
   >
+   
     <View style={styles.modalContainer}>
       <View style={{ backgroundColor: 'white',borderTopLeftRadius: 10, borderTopRightRadius: 10, padding: 20, width: '100%', height: screenHeight * 0.9, zIndex: 2000, position: 'absolute', bottom: 0 }}>
         <View style={{flexDirection: "row", justifyContent: 'space-between',}}>
           <Text onPress={onClose}>X</Text>
-          <Button title="Done" onPress={handleSubmit(onSubmit)} />
+          <Button title="Done" onPress={handleSubmit(onSubmit) } />
+          {/* {formState.errors && <Text>This field is required</Text>} */}
           {/* {formState.errors && <Text>This field is required</Text>} */}
 
         </View>
@@ -240,7 +264,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
           <View style={styles.formColumn}>
             <Text style={{marginBottom: 10, fontSize: 16}}>Manufacturer</Text>
             <View style={{ zIndex: 2000}}>
-            <Controller
+            {/* <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
                <DropDownPicker
@@ -254,7 +278,8 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
               />
               )}
               name="manufacturer"
-            /> 
+            />  */}
+            {/* {errors.manufacturer && <Text>This field is required</Text>}  */}
             </View>
             <Text style={{marginBottom: 10, fontSize: 16, marginTop: 10}}>Serial #</Text>
             <Controller
@@ -275,16 +300,21 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
          <View style={styles.formColumn}>
           <Text style={{marginBottom: 10, fontSize: 16}}>Model</Text>
             <View style={{ zIndex: 2000}}>
+            {/* <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
               <DropDownPicker
-                open={open}
+                open={openModel}
                 value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
+                items={model}
+                setOpen={setOpenModel}
+                setValue={setValueModel}
+                setItems={setModel}
                 style={{borderRadius: 0}}
-
               />
+              )}
+              name="model"
+            /> */}
               </View>
                <Text style={{marginBottom: 10, fontSize: 16, marginTop: 10}}>Model #</Text>
               <Controller
@@ -302,13 +332,13 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
               )}
                 name="purchaseDate"
               /> 
-               <Controller
+               {/* <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
             <Switch style={{marginBottom: 10}} value={isSwitchOn} onValueChange={onToggleSwitch} />
             )}
             name="underWarranty"
-            /> 
+            />  */}
             <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
@@ -332,15 +362,15 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
           <Text style={{marginBottom: 10, fontSize: 16,}}> Assign to Floor</Text>
           <View style={{ zIndex: 2000}}>
           <Controller
-        control={control}
-        render={({ field: { onChange, value } }) => (
+            control={control}
+            render={({ field: { onChange, value } }) => (
                <DropDownPicker
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
+                open={openFloor}
+                value={valueFloor}
+                items={floor}
+                setOpen={setOpenFloor}
+                setValue={setValueFloor}
+                setItems={setFloor}
                 style={{borderRadius: 0}}
           
               />
@@ -356,19 +386,22 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
             control={control}
             render={({ field: { onChange, value } }) => (
                <DropDownPicker
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
+                open={openRoom}
+                value={valueRoom}
+                items={room}
+                setOpen={setOpenRoom}
+                setValue={setValueRoom}
+                setItems={setRoom}
                 style={{borderRadius: 0}}
           
               />
               )}
               name="assignToRoom"
             />
+                  
+
             </View>
+            
         </View>
       </View>
       </ScrollView>
