@@ -21,7 +21,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.liamwelling.houseeverythingfrontend"
+      "bundleIdentifier": "com.liamwelling.houseeverythingfrontend",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -39,13 +40,21 @@
     },
     "plugins": [
       [
+        "@react-native-firebase/app",
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends.",
           "cameraPermission": "The app accesses your camera to let you take photos to share with your friends."
+        },
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
     ]
+    
    
   }
 }
