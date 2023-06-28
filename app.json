@@ -39,23 +39,21 @@
       }
     },
     "plugins": [
-      [
-        "@react-native-firebase/app",
-        [
-          "expo-build-properties",
-           {
-            "ios": {
-               "useFrameworks": "static"
-             }
-           }
-         ],
+      [       
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends.",
           "cameraPermission": "The app accesses your camera to let you take photos to share with your friends."
         }
-     
-      ]
+      ],
+      "@react-native-firebase/app",
+        
+     [ "expo-build-properties",
+       {
+        "ios": {
+           "useFrameworks": "static"
+         }
+       }]
     ]
     
    
