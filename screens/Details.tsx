@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React from 'react'
+import useUserDetailsStore from '../stateStores/userDetailsStore'
 
 const Details = ({navigation}:any) => {
+  const userDetails = useUserDetailsStore();
   return (
     <View style={styles.container}>
       <View style={styles.upperContainer}>

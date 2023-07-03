@@ -8,27 +8,33 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "contain"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
-    "build": {
-      "preview": {
-        "distribution": "internal"
-      }
-    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends.",
+          "cameraPermission": "The app accesses your camera to let you take photos to share with your friends."
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.liamwelling.houseeverythingfrontend",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "bundleIdentifier": "com.liamwelling.houseeverythingfrontend"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.liamwelling.houseeverythingfrontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,25 +43,6 @@
       "eas": {
         "projectId": "708c2a8d-1621-4892-a10a-c361ccf966bb"
       }
-    },
-    "plugins": [
-      [       
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends.",
-          "cameraPermission": "The app accesses your camera to let you take photos to share with your friends."
-        }
-      ],
-      "@react-native-firebase/app",
-        
-     [ "expo-build-properties",
-       {
-        "ios": {
-           "useFrameworks": "static"
-         }
-       }]
-    ]
-    
-   
+    }
   }
 }

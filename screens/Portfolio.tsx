@@ -1,20 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import BarcodeScanner from '../components/BarcodeScanner'
+import useUserDetailsStore from '../stateStores/userDetailsStore'
 
-const Portfolio = () => {
+const Portfolio = ({navigation}:any) => {
+  const userDetails = useUserDetailsStore();
+
   return (
     <View style={styles.pageContainer}>
-      <Text style={styles.welcomeText}>Hey there, welcome to House Everything!</Text>
+      <Text style={styles.welcomeText}>Welcome {userDetails.firstName}.</Text>
       
       <View style={styles.contentRow}>
-        <View style={styles.completeProfileContainer}>
-          <Text>Current Portfolio</Text>
+        <View style={styles.upperRowContainer}>
+          <View style={styles.completeProfilePhoto}/>
+          <Text>{userDetails.firstName}'s Portfolio</Text>
         </View>
+        
 
-        <View style={styles.completeProfileContainer}>
-          <Text>Current Portfolio</Text>
+        <View style={styles.upperRowContainer}>
+          
+        <Pressable onPress={() => navigation.navigate('Details')}>
+
+          <View style={styles.completeProfilePhoto}/>
+          <Text>Property details</Text>
+          </Pressable>
         </View>
+       
       </View>
       <BarcodeScanner />
     </View>
@@ -41,9 +52,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 18,
   },
-  completeProfileContainer: {
+  completeProfilePhoto: {
     height: 130,
     width: 130,
     backgroundColor: 'grey',
+    borderRadius: 100,
   },
+  upperRowContainer: {
+  flexDirection: 'column',
+  alignItems: 'center',
+  }
 })

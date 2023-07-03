@@ -8,6 +8,8 @@ import { Switch } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import axios from 'axios';
+import { SERVER_URL } from '@env';
 
 
 
@@ -77,6 +79,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
   const [valueModel, setValueModel] = useState(null);
   const [valueFloor, setValueFloor] = useState(null);
   const [valueRoom, setValueRoom] = useState(null);
+
   const [manufacturer, setManufacturer] = useState([
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
@@ -93,24 +96,6 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
   ]);
-
-  /// form 
-  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-  });
-
-  const dropdownData = {
-    // manufacturer: manufacturer,
-    // model: model,
-    floor: valueFloor,
-    room: valueRoom,
-    underWarranty: isSwitchOn
-  }
-
-  const onSubmit = (data: FormValues) => {
-    console.log({...data,...dropdownData});
-  
-  };
 
   const detailsStore = useStore(state => state);
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
@@ -166,6 +151,70 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
     }
   };
 
+  /// form 
+  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+  });
+
+  const dropdownData = {
+    category: detailsStore.selectedCategory?.label,
+    subcategory: detailsStore.selectedSubcategory?.label,
+    manufacturer: valueManufacturer,
+    model: valueModel,
+    floor: valueFloor,
+    room: valueRoom,
+    underWarranty: isSwitchOn
+  }
+
+  const onSubmit = (data: FormValues) => {
+    // console.log({...data,...dropdownData});
+    sendItemDetails({...data,...dropdownData}, actualImage);  
+  };
+
+// const sendItemDetails = async (params:any) => {
+//   console.log('params:',params)
+//   try {
+//     const response = await axios.post(SERVER_URL + '/add_items', {
+//       params
+//     });
+//     console.log(response.data)
+//   } catch (error) {
+//     console.error(error);
+// }
+  
+// }
+
+const sendItemDetails = async (params:any, imageUri: string) => {
+  // console.log('params:',params)
+  try {
+    const formData = new FormData();
+
+    let uriParts = imageUri.split('.');
+    let fileType = uriParts[uriParts.length - 1];
+    const file = {
+      uri: imageUri,
+      name: `photo.${fileType}`,
+      type: `image/${fileType}`,
+  } as any;
+
+  formData.append('file', file);
+
+
+    // Append other fields to formData
+    Object.keys(params).forEach(key => {
+      formData.append(key, params[key]);
+    });
+
+    const response = await axios.post(SERVER_URL + '/add_items', formData);
+
+    console.log(response.data)
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+
   // if (permission?.status ! === ImagePicker.PermissionStatus.GRANTED) {
   //   Alert.alert('Permission not granted');
   //   return (
@@ -200,7 +249,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
         <Text style={styles.categoriesText}>{detailsStore.selectedCategory?.label} {'>'} {detailsStore.selectedSubcategory?.label}</Text>
         <View style={{height: 1, width: 340,  backgroundColor: 'lightgrey', marginLeft: 'auto', marginRight: 'auto', marginBottom: 10}}/>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
         {/* <Button title="Request Permission" onPress={requestPermission}></Button>  
 
         <Button title="Pick an image from camera roll" onPress={pickActualImage} />
@@ -264,9 +313,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
           <View style={styles.formColumn}>
             <Text style={{marginBottom: 10, fontSize: 16}}>Manufacturer</Text>
             <View style={{ zIndex: 2000}}>
-            {/* <Controller
-              control={control}
-              render={({ field: { onChange, value } }) => (
+          
                <DropDownPicker
                 open={openManufacturer}
                 value={valueManufacturer}
@@ -276,9 +323,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
                 setItems={setManufacturer}
                 style={{borderRadius: 0}}
               />
-              )}
-              name="manufacturer"
-            />  */}
+          
             {/* {errors.manufacturer && <Text>This field is required</Text>}  */}
             </View>
             <Text style={{marginBottom: 10, fontSize: 16, marginTop: 10}}>Serial #</Text>
@@ -300,9 +345,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
          <View style={styles.formColumn}>
           <Text style={{marginBottom: 10, fontSize: 16}}>Model</Text>
             <View style={{ zIndex: 2000}}>
-            {/* <Controller
-              control={control}
-              render={({ field: { onChange, value } }) => (
+          
               <DropDownPicker
                 open={openModel}
                 value={value}
@@ -312,9 +355,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
                 setItems={setModel}
                 style={{borderRadius: 0}}
               />
-              )}
-              name="model"
-            /> */}
+            
               </View>
                <Text style={{marginBottom: 10, fontSize: 16, marginTop: 10}}>Model #</Text>
               <Controller
@@ -339,6 +380,7 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
             )}
             name="underWarranty"
             />  */}
+             <Switch style={{marginBottom: 10}} value={isSwitchOn} onValueChange={onToggleSwitch} />
             <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
