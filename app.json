@@ -14,6 +14,13 @@
       "**/*"
     ],
     "plugins": [
+      "@react-native-firebase/app",
+      "expo-build-properties",
+      {
+        "ios": {
+          "useFrameworks": "static"
+        }
+      },
       [
         "expo-image-picker",
         {
@@ -24,7 +31,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.liamwelling.houseeverythingfrontend"
+      "bundleIdentifier": "com.liamwelling.houseeverythingfrontend",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
