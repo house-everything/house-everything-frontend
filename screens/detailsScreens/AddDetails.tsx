@@ -25,7 +25,12 @@ const { width } = Dimensions.get('window');
 const itemSize = width / 3;
 
 const AddDetails = () => {
-
+  const filterProps = {
+    floor: "First Floor",
+    room: "Living Room",
+    category: "Furniture",
+    subcategory: "Tables",
+  };
   const detailStore = useStore(state => state);
   const modalStore = useModalStore(state => state);
   const [open, setOpen] = useState(false);
@@ -239,7 +244,7 @@ const AddDetails = () => {
   return (
     <ScrollView style={styles.container}>
         <AddCategoryModal visible={modalStore.isCategoryModalOpen} onClose={modalStore.closeCategoryModal}/>
-        <AddDetailsModal visible={modalStore.isDetailsModalOpen} onClose={modalStore.closeDetailsModal}/>
+        <AddDetailsModal visible={modalStore.isDetailsModalOpen} onClose={modalStore.closeDetailsModal} filterProps={filterProps}/>
      <View style={styles.upperContainer}>
         <View style={styles.upperContainerLeft}>
           <View style={styles.upperLeftPhoto}></View>

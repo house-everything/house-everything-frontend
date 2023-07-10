@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "478491764324",
+    "project_id": "house-everything-90711",
+    "storage_bucket": "house-everything-90711.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478491764324:android:5b16697b9ab3e178d2e171",
+        "android_client_info": {
+          "package_name": "com.liamwelling.houseeverythingfrontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478491764324-v51e5v5jjnuorkqro7gr27odlt903lka.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDe57GN5mztsSMEWw4Esj1L9VrdGgvqWTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "478491764324-v51e5v5jjnuorkqro7gr27odlt903lka.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "478491764324-p66n2lfkiu9qjhrbkdabbtds15mjrbho.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.liamwelling.houseeverythingfrontend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

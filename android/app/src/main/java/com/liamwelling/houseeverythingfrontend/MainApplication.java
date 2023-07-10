@@ -1,4 +1,4 @@
-package com.houseeverythingfrontend;
+package com.liamwelling.houseeverythingfrontend;
 
 import android.app.Application;
 import android.content.res.Configuration;

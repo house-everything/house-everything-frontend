@@ -24,6 +24,10 @@ import SignUp from './screens/authScreens/SignUp';
 import Owners from './screens/detailsScreens/Owners';
 import AddDetails from './screens/detailsScreens/AddDetails';
 import ManageDetails from './screens/detailsScreens/ManageDetails';
+import StartDetails from './screens/detailsScreens/StartDetails';
+import ByLocations from './screens/detailsScreens/ByLocations';
+import ByObject from './screens/detailsScreens/ByObject';
+import ByRoomsAndFloors from './screens/detailsScreens/ByRoomsAndFloors';
 
 
 const Stack = createNativeStackNavigator();
@@ -45,10 +49,15 @@ const DetailsStack = createNativeStackNavigator();
 const DetailsStackNavigator = () => {
   return (
     <DetailsStack.Navigator>
-      <DetailsStack.Screen name="Details" component={Details} />
-      <DetailsStack.Screen name="Owners" component={Owners} />
-      <DetailsStack.Screen name="AddDetails" component={AddDetails} />
-      <DetailsStack.Screen name="ManageDetails" component={ManageDetails} />
+      {/* <DetailsStack.Screen options={{ headerShown: false }}  name="Details" component={Details} /> */}
+      <DetailsStack.Screen options={{ headerShown: false }}  name="StartDetails" component={StartDetails} />
+      <DetailsStack.Screen options={{ headerShown: false }}  name="Owners" component={Owners} />
+      {/* add details == by category */}
+      <DetailsStack.Screen options={{ headerShown: false }}  name="AddDetails" component={AddDetails} />
+      <DetailsStack.Screen options={{ headerShown: false }}  name="ByObject" component={ByObject} />
+      <DetailsStack.Screen options={{ headerShown: false }}  name="ByLocations" component={ByLocations} />
+      <DetailsStack.Screen options={{ headerShown: false }}  name="ByRoomsAndFloors" component={ByRoomsAndFloors} />
+      <DetailsStack.Screen options={{ headerShown: false }}  name="ManageDetails" component={ManageDetails} />
   </DetailsStack.Navigator>
   )
   }

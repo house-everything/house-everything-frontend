@@ -11,8 +11,8 @@ const Details = ({navigation}:any) => {
           <View style={styles.upperLeftPhoto}></View>
         </View>
         <View style={styles.upperContainerRight}>
-          <Text>Address</Text>
-          <Text>City, State, Zip</Text>
+          <Text style={styles.upperContainerLargeText}>Details & Specifics</Text>
+          <Text style={styles.upperContainerSmallText}>Add items that are part of the property. Do this when you have access to the either the  items, receipts, manuals, product details or labels and the like.</Text>
         </View>
       </View>  
 
@@ -82,19 +82,29 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 120,
     width: 120,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   upperContainerRight: {
     flex: 2,
     width: 120,
     height: 120,
     flexDirection: 'column',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 10,
    
   },
+  upperContainerSmallText: {
+    fontSize: 12,
+  },
+  upperContainerLargeText: {
+    fontSize: 20,
+  },
   upperLeftPhoto: {
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
     borderRadius: 50,
     backgroundColor: 'blue',
   },

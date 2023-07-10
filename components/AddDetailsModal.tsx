@@ -5,7 +5,7 @@ import { useStore } from '../stateStores/DetailsStore';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Switch } from 'react-native-paper';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, set } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import axios from 'axios';
@@ -59,14 +59,34 @@ const schema = yup.object().shape({
 //   assignToFloor: '',
 //   assignToRoom: '',
 // };
-const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => {
+interface AddDetailsModalProps {
+  visible: boolean;
+  onClose: () => void;
+  filterProps: FilterProps;
+}
+
+interface FilterProps {
+  floor?: string;
+  room?: string;
+  category?: string;
+  subcategory?: string;
+}
+const AddDetailsModal: React.FC<AddDetailsModalProps> = ({ visible, onClose, filterProps }) => {
+  const { floor, room, category, subcategory } = filterProps;
+
+  // Assuming there is a state for each filter prop to control the form inputs
+  const [selectedFloor, setSelectedFloor] = useState(floor || "");
+  const [selectedRoom, setSelectedRoom] = useState(room || "");
+  const [selectedCategory, setSelectedCategory] = useState(category || "");
+  const [selectedSubcategory, setSelectedSubcategory] = useState(subcategory || "");
 
   const [permission, requestPermission] = ImagePicker.useCameraPermissions();
   const [files, setFiles] = useState([]);
   const [value, setValue] = useState(null);
   const [open, setOpen] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
-
+  const [successModal, setSuccessModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
@@ -88,11 +108,11 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
   ]);
-  const [floor, setFloor] = useState([
+  const [floorDropDown, setFloorDropDown] = useState([
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
   ]);
-  const [room, setRoom] = useState([
+  const [roomDropDown, setRoomDropDown] = useState([
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
   ]);
@@ -185,6 +205,8 @@ const AddDetailsModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ 
 // }
 
 const sendItemDetails = async (params:any, imageUri: string) => {
+setLoading(true);
+setSuccessModal(true);
   // console.log('params:',params)
   try {
     const formData = new FormData();
@@ -206,7 +228,8 @@ const sendItemDetails = async (params:any, imageUri: string) => {
     });
 
     const response = await axios.post(SERVER_URL + '/add_items', formData);
-
+    
+    setLoading(false);
     console.log(response.data)
   } catch (error) {
     console.error(error);
@@ -235,18 +258,39 @@ const sendItemDetails = async (params:any, imageUri: string) => {
     visible={visible}
 
   >
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={successModal}
+      >
+         <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{loading? 'loading' : 'complete'}Submitted!</Text>
+
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {setSuccessModal(!successModal); onClose();}}
+            >
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
    
     <View style={styles.modalContainer}>
       <View style={{ backgroundColor: 'white',borderTopLeftRadius: 10, borderTopRightRadius: 10, padding: 20, width: '100%', height: screenHeight * 0.9, zIndex: 2000, position: 'absolute', bottom: 0 }}>
         <View style={{flexDirection: "row", justifyContent: 'space-between',}}>
-          <Text onPress={onClose}>X</Text>
+          <Pressable onPress={onClose}>
+          <Text >X</Text>
+          </Pressable>
           <Button title="Done" onPress={handleSubmit(onSubmit) } />
           {/* {formState.errors && <Text>This field is required</Text>} */}
           {/* {formState.errors && <Text>This field is required</Text>} */}
 
         </View>
-      
-        <Text style={styles.categoriesText}>{detailsStore.selectedCategory?.label} {'>'} {detailsStore.selectedSubcategory?.label}</Text>
+        <Text style={styles.categoriesText}>{filterProps.category} {'>'} {filterProps.subcategory}</Text>
+
+        {/* <Text style={styles.categoriesText}>{detailsStore.selectedCategory?.label} {'>'} {detailsStore.selectedSubcategory?.label}</Text> */}
         <View style={{height: 1, width: 340,  backgroundColor: 'lightgrey', marginLeft: 'auto', marginRight: 'auto', marginBottom: 10}}/>
 
         <ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={false}>
@@ -409,10 +453,10 @@ const sendItemDetails = async (params:any, imageUri: string) => {
                <DropDownPicker
                 open={openFloor}
                 value={valueFloor}
-                items={floor}
+                items={floorDropDown}
                 setOpen={setOpenFloor}
                 setValue={setValueFloor}
-                setItems={setFloor}
+                setItems={setFloorDropDown}
                 style={{borderRadius: 0}}
           
               />
@@ -430,10 +474,10 @@ const sendItemDetails = async (params:any, imageUri: string) => {
                <DropDownPicker
                 open={openRoom}
                 value={valueRoom}
-                items={room}
+                items={roomDropDown}
                 setOpen={setOpenRoom}
                 setValue={setValueRoom}
-                setItems={setRoom}
+                setItems={setRoomDropDown}
                 style={{borderRadius: 0}}
           
               />
@@ -496,5 +540,46 @@ const styles = StyleSheet.create({
   formText: {
     marginTop: 10,
     marginBottom: 20,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   }
 })

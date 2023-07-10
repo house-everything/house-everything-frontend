@@ -1,4 +1,4 @@
-package com.houseeverythingfrontend;
+package com.liamwelling.houseeverythingfrontend;
 
 import android.os.Build;
 import android.os.Bundle;

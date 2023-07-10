@@ -117,11 +117,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 80,
     paddingHorizontal: 10,  // to provide 10 width from the edges
     // backgroundColor:'red',
     borderBottomWidth: 2,
     borderBottomColor: '#D8D8D8',
+    zIndex: 3000,
   },
   buttonContainer: {
     flex: 1,

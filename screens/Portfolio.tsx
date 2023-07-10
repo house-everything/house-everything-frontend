@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import BarcodeScanner from '../components/BarcodeScanner'
 import useUserDetailsStore from '../stateStores/userDetailsStore'
@@ -7,28 +7,67 @@ const Portfolio = ({navigation}:any) => {
   const userDetails = useUserDetailsStore();
 
   return (
-    <View style={styles.pageContainer}>
-      <Text style={styles.welcomeText}>Welcome {userDetails.firstName}.</Text>
+    <ScrollView style={styles.pageContainer}>
+      <Text style={styles.welcomeText}>
+        Welcome {userDetails.firstName}.
+      </Text>
       
       <View style={styles.contentRow}>
+
         <View style={styles.upperRowContainer}>
           <View style={styles.completeProfilePhoto}/>
-          <Text>{userDetails.firstName}'s Portfolio</Text>
+          <Text style={styles.largeText}>{userDetails.firstName}'s Portfolio</Text>
+          <Text style={styles.smallText}>Add/edit details</Text>
         </View>
         
-
-        <View style={styles.upperRowContainer}>
-          
         <Pressable onPress={() => navigation.navigate('Details')}>
-
+        <View style={styles.upperRowContainer}>
+        
           <View style={styles.completeProfilePhoto}/>
-          <Text>Property details</Text>
-          </Pressable>
+          <Text style={styles.largeText}>Property details</Text>
+          <Text style={styles.smallText}>Add/edit details</Text>
+
         </View>
+        </Pressable>
        
       </View>
-      <BarcodeScanner />
-    </View>
+
+      <View style={styles.contentRow}>
+
+      <View style={styles.upperRowContainer}>
+      <View style={styles.squareImageContainer}/>
+        <Text style={styles.largeText}>Connect</Text>
+        <Text style={styles.smallText}>Integrate with your contacts & calendar</Text>
+      </View>
+
+      
+      <View style={styles.upperRowContainer}>
+
+        <View style={styles.squareImageContainer}/>
+        <Text style={styles.largeText}>Review reports</Text>
+        <Text style={styles.smallText}>Review & update reports</Text>
+      </View>
+
+      </View>
+      <View style={styles.contentRow}>
+
+<View style={styles.upperRowContainer}>
+<View style={styles.squareImageContainer}/>
+  <Text style={styles.largeText}>Connect</Text>
+  <Text style={styles.smallText}>Integrate with your contacts & calendar</Text>
+</View>
+
+
+<View style={styles.upperRowContainer}>
+
+  <View style={styles.squareImageContainer}/>
+  <Text style={styles.largeText}>Review reports</Text>
+  <Text style={styles.smallText}>Review & update reports</Text>
+</View>
+
+</View>
+<View style={{marginBottom: 50}}/>
+    </ScrollView>
   )
 }
 
@@ -61,5 +100,18 @@ const styles = StyleSheet.create({
   upperRowContainer: {
   flexDirection: 'column',
   alignItems: 'center',
-  }
+  width: 150
+  }, 
+  squareImageContainer: {
+    height: 150,  
+    width: 150,
+    backgroundColor: 'grey',
+  },
+  largeText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'blue',
+  },
+  smallText: {
+  },
 })

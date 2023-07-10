@@ -8,6 +8,7 @@ interface Store {
   isDetailsModalOpen: boolean;
   openDetailsModal: () => void;
   closeDetailsModal: () => void;
+  
 }
 
 export const useModalStore = create<Store>((set) => ({
