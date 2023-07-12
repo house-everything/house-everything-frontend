@@ -2,6 +2,7 @@
 import { StyleSheet, Text, View, Modal, Button, Dimensions, FlatList, TouchableOpacity, TextInput, StatusBar, Alert, ScrollView, Image, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../stateStores/DetailsStore';
+import { useFloorsAndRoomsStore, } from '../stateStores/ByRoomsAndFloorsStore';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Switch } from 'react-native-paper';
@@ -10,7 +11,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import axios from 'axios';
 import { SERVER_URL } from '@env';
-
+import { FontAwesome } from '@expo/vector-icons';
 
 
 const screenHeight = Dimensions.get('window').height;
@@ -70,6 +71,7 @@ interface FilterProps {
   room?: string;
   category?: string;
   subcategory?: string;
+  objectType?: string;
 }
 const AddDetailsModal: React.FC<AddDetailsModalProps> = ({ visible, onClose, filterProps }) => {
   const { floor, room, category, subcategory } = filterProps;
@@ -97,8 +99,8 @@ const AddDetailsModal: React.FC<AddDetailsModalProps> = ({ visible, onClose, fil
   const [openRoom, setOpenRoom] = useState(false);
   const [valueManufacturer, setValueManufacturer] = useState(null);
   const [valueModel, setValueModel] = useState(null);
-  const [valueFloor, setValueFloor] = useState(null);
-  const [valueRoom, setValueRoom] = useState(null);
+  const [valueFloor, setValueFloor] = useState<any>();
+  const [valueRoom, setValueRoom] = useState<any>();
 
   const [manufacturer, setManufacturer] = useState([
     {label: 'Apple', value: 'apple'},
@@ -108,10 +110,18 @@ const AddDetailsModal: React.FC<AddDetailsModalProps> = ({ visible, onClose, fil
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
   ]);
-  const [floorDropDown, setFloorDropDown] = useState([
-    {label: 'Apple', value: 'apple'},
-    {label: 'Banana', value: 'banana'}
-  ]);
+
+  ///these should be from the same list that the floor / room filter uses
+  const floors = [
+    'Basement',
+    'First Floor',
+    'Second Floor',
+    'Attic',
+    ]
+  const [floorDropDown, setFloorDropDown] = useState(floors.map(floor => {
+    return {label: floor.charAt(0).toUpperCase() + floor.slice(1), value: floor.toLowerCase()}
+  }));
+
   const [roomDropDown, setRoomDropDown] = useState([
     {label: 'Apple', value: 'apple'},
     {label: 'Banana', value: 'banana'}
@@ -176,9 +186,9 @@ const AddDetailsModal: React.FC<AddDetailsModalProps> = ({ visible, onClose, fil
     resolver: yupResolver(schema),
   });
 
-  const dropdownData = {
-    category: detailsStore.selectedCategory?.label,
-    subcategory: detailsStore.selectedSubcategory?.label,
+  const dataValues = {
+    category: filterProps.category,
+    subcategory: filterProps.objectType,
     manufacturer: valueManufacturer,
     model: valueModel,
     floor: valueFloor,
@@ -188,7 +198,7 @@ const AddDetailsModal: React.FC<AddDetailsModalProps> = ({ visible, onClose, fil
 
   const onSubmit = (data: FormValues) => {
     // console.log({...data,...dropdownData});
-    sendItemDetails({...data,...dropdownData}, actualImage);  
+    sendItemDetails({...data,...dataValues}, actualImage);  
   };
 
 // const sendItemDetails = async (params:any) => {
@@ -208,19 +218,21 @@ const sendItemDetails = async (params:any, imageUri: string) => {
 setLoading(true);
 setSuccessModal(true);
   // console.log('params:',params)
+  // if (imageUri !== null) {
   try {
     const formData = new FormData();
 
+    if (imageUri !== null) {
     let uriParts = imageUri.split('.');
     let fileType = uriParts[uriParts.length - 1];
     const file = {
       uri: imageUri,
       name: `photo.${fileType}`,
       type: `image/${fileType}`,
-  } as any;
+    } as any;
 
-  formData.append('file', file);
-
+    formData.append('file', file);
+  }
 
     // Append other fields to formData
     Object.keys(params).forEach(key => {
@@ -249,8 +261,13 @@ setSuccessModal(true);
   //   )
   // }
    useEffect(() => {
-      requestPermission();
+    requestPermission();
+     
     }, []);
+    useEffect(() => {
+      setValueFloor(filterProps.floor?.toString());
+      setValueRoom(filterProps.room?.toString()); 
+    }, [filterProps.floor])
   return (
     <Modal
     animationType="slide"
@@ -265,7 +282,7 @@ setSuccessModal(true);
       >
          <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>{loading? 'loading' : 'complete'}Submitted!</Text>
+            <Text style={styles.modalText}>{loading? 'Your form is being submitted' : 'Complete'}</Text>
 
             <Pressable
               style={[styles.button, styles.buttonClose]}
@@ -288,7 +305,7 @@ setSuccessModal(true);
           {/* {formState.errors && <Text>This field is required</Text>} */}
 
         </View>
-        <Text style={styles.categoriesText}>{filterProps.category} {'>'} {filterProps.subcategory}</Text>
+        <Text onPress={() => console.log(valueFloor)} style={styles.categoriesText}>{filterProps.category} {'>'} {filterProps.objectType}</Text>
 
         {/* <Text style={styles.categoriesText}>{detailsStore.selectedCategory?.label} {'>'} {detailsStore.selectedSubcategory?.label}</Text> */}
         <View style={{height: 1, width: 340,  backgroundColor: 'lightgrey', marginLeft: 'auto', marginRight: 'auto', marginBottom: 10}}/>
@@ -311,7 +328,9 @@ setSuccessModal(true);
               <Image source={{ uri: actualImage }} style={{ width: 90, height: 100 }} /> 
             : 
             <>
-             <View style={{backgroundColor: 'lightgrey', width: 90, height: 100}}/>
+             <View style={{backgroundColor: 'lightgrey', width: 90, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+              <FontAwesome name="photo" size={24} color="black" />
+            </View>
              
              </>
             }
@@ -326,7 +345,9 @@ setSuccessModal(true);
             <Image source={{ uri: labelImage }} style={{ width: 90, height: 100 }} />
             :
             <>
-            <View style={{backgroundColor: 'lightgrey', width: 90, height: 100}}/>
+            <View style={{backgroundColor: 'lightgrey', width: 90, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+              <FontAwesome name="photo" size={24} color="black" />
+            </View>
             </>
           }
             <Pressable onPress={pickLabelImage}>
@@ -340,7 +361,9 @@ setSuccessModal(true);
              <Image source={{ uri: receiptImage }} style={{ width: 90, height: 100 }} />
              :
              <>
-             <View style={{backgroundColor: 'lightgrey', width: 90, height: 100}}/>
+            <View style={{backgroundColor: 'lightgrey', width: 90, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+              <FontAwesome name="photo" size={24} color="black" />
+            </View>
            
              </>
             }
@@ -424,7 +447,7 @@ setSuccessModal(true);
             )}
             name="underWarranty"
             />  */}
-             <Switch style={{marginBottom: 10}} value={isSwitchOn} onValueChange={onToggleSwitch} />
+             <Switch style={{marginBottom: 10, marginLeft: 'auto'}} color='blue' value={isSwitchOn} onValueChange={onToggleSwitch} />
             <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
@@ -458,6 +481,8 @@ setSuccessModal(true);
                 setValue={setValueFloor}
                 setItems={setFloorDropDown}
                 style={{borderRadius: 0}}
+                placeholder={valueFloor ? `${filterProps.floor?.toString() }` : 'Select Floor'}
+
           
               />
               )}
@@ -479,6 +504,7 @@ setSuccessModal(true);
                 setValue={setValueRoom}
                 setItems={setRoomDropDown}
                 style={{borderRadius: 0}}
+                placeholder={valueRoom ? `${filterProps.room?.toString() }` : 'Select Room'}
           
               />
               )}
@@ -536,6 +562,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 20,
+    paddingLeft: 10
   },
   formText: {
     marginTop: 10,

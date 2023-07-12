@@ -1,10 +1,12 @@
 import { FlatList, Dimensions, View, Text, StyleSheet, TouchableOpacity, Button, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react'
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useStore, } from '../../stateStores/ByRoomsAndFloorsStore';
+import { useFloorsAndRoomsStore, } from '../../stateStores/ByRoomsAndFloorsStore';
 import { useModalStore } from '../../stateStores/ModalStore';
 import AddCategoryModal from '../../components/AddCategoryModal';
 import AddDetailsModal from '../../components/AddDetailsModal';
+import { FontAwesome } from '@expo/vector-icons';
+
 
 interface CategoryBoxProps {
   item: Category | Subcategory | Item;
@@ -27,35 +29,21 @@ const itemSize = width / 3;
 
 const ByRoomsAndFloors = () => {
 
+  const Store = useFloorsAndRoomsStore(state => state);
+  const modalStore = useModalStore(state => state);
 
-  const floors: string[] = [
-  'Basement',
-  'First Floor',
-  'Second Floor',
-  'Attic',
-  ]
+  const floors = Store.floors;
 
   /// room structure in DB should be like this:
-  const rooms = [
-  {name: 'Bathroom', floor: 'First Floor'},
-  {name: 'Primary Bedroom', floor: 'First Floor'},
-  {name: 'Kitchen', floor: 'First Floor'},
-  {name: 'Kids Bedroom', floor: 'Second Floor'},
-  {name: 'Guest Bedroom', floor: 'Second Floor'},
-  {name: 'Bathroom', floor: 'Second Floor'},
-  {name: 'Workshop', floor: 'Basement'},
-  {name: 'Laundry Room', floor: 'Basement'},
-  {name: 'Storage Room', floor: 'Basement'},
-  {name: 'Storage Room', floor: 'Attic'},
-  ]
+  const rooms = Store.rooms;
 
 
   const categories = [
-   'Appliances',
-   'Mechanicals',
-   'Interior',
-   'Exterior',
-   'Septic & Waste' 
+   'appliances',
+   'mechanicals',
+   'interior',
+   'exterior',
+   'septic & waste' 
   ]
 
   const objects = [
@@ -76,24 +64,33 @@ const ByRoomsAndFloors = () => {
     {name: 'Water Tank', category: 'mechanicals', },
 
   ]
-  const Store = useStore(state => state);
-  const modalStore = useModalStore(state => state);
+ 
 
 
   const [filteredRooms, setFilteredRooms] = useState(rooms);
   const [selectCategory, setSelectCategory] = useState('');
-  
+
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedFloor, setSelectedFloor] = useState('');
+  const [objectType, setObjectType] = useState('');
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
+
   const filterProps = {
-    floor: "First Floor",
-    room: "Living Room",
-    category: "Furniture",
-    subcategory: "Tables",
+    floor: selectedFloor,
+    room: selectedRoom,
+    category: selectCategory,
+    objectType: objectType
   };
 
 
   useEffect(() => {
     if (Store.area !== '') {
-      setFilteredRooms(rooms.filter((room) => room.floor === Store.area));
+      setFilteredRooms(rooms.filter((room: any) => room.floor === Store.area));
     } else {
       setFilteredRooms(rooms);
     }
@@ -107,43 +104,45 @@ const ByRoomsAndFloors = () => {
     return chunks;
   }
   
-  
-  const GridBox: React.FC<CategoryBoxProps> = ({ item }:any) => {
+
+  /// function that will take in a room and then set the room and floor in the filter props
+  const setRoomAndFloor = (roomName: string) => {
+    const roomData = rooms.find((room: any) => room.name === roomName);
+    if (roomData) {
+      setSelectedRoom(roomData.name);
+      setSelectedFloor(roomData.floor);
+    }
+  };
+  const RoomGridBox: React.FC<CategoryBoxProps> = ({ item }:any) => {
     // const navigate = useStore(state => state.navigate);
   
     return (
       <TouchableOpacity style={styles.categoryBox} 
-      onPress={() => Store.setArea(item)}
+      onPress={() => setRoomAndFloor(item)}
       >
-             <View style={styles.categoryPhoto}></View>
+             <View style={styles.categoryPhoto}>
+             <FontAwesome name="photo" size={24} color="black" />
+             </View>
   
         <Text style={styles.categoryBoxText}>{item}</Text>
         <Text style={styles.categoryBoxTextSmall}>add details </Text>
       </TouchableOpacity>
     );
   };
-  
-  
-  const Grid: React.FC<any> = ({ categories }) => {
-  
+  const FloorGridBox: React.FC<CategoryBoxProps> = ({ item }:any) => {
+    // const navigate = useStore(state => state.navigate);
   
     return (
-      <View style={styles.container}>
+      <TouchableOpacity style={styles.categoryBox} 
+      onPress={() => setSelectedFloor(item)}
+      >
+             <View style={styles.categoryPhoto}>
+             <FontAwesome name="photo" size={24} color="black" />
+             </View>
   
-        {dataInChunks(categories, 3).map((row, index:any) => (
-          <View key={index} style={{ flexDirection: 'row', marginBottom: 15, marginTop: 15 }}>
-            {row.map((item:any) => (
-              
-              <GridBox key={index} item={item} />
-             
-              
-            ))}
-          </View>
-        ))}
-              {/* {navLevel === 'categories' && <Button title="Add Item" onPress={() => modalStore.openCategoryModal()} />}
-              {navLevel === 'items' && <Button title="Add Item" onPress={() => modalStore.openDetailsModal()} />} */}
-  
-      </View>
+        <Text style={styles.categoryBoxText}>{item}</Text>
+        <Text style={styles.categoryBoxTextSmall}>add details </Text>
+      </TouchableOpacity>
     );
   };
 
@@ -154,7 +153,9 @@ const ByRoomsAndFloors = () => {
       <TouchableOpacity style={styles.categoryBox} 
       onPress={() => setSelectCategory(item)}
       >
-             <View style={styles.categoryPhoto}></View>
+             <View style={styles.categoryPhoto}>
+              <FontAwesome name="photo" size={24} color="black" />
+             </View>
   
         <Text style={styles.categoryBoxText}>{item}</Text>
         <Text style={styles.categoryBoxTextSmall}>add details </Text>
@@ -162,35 +163,17 @@ const ByRoomsAndFloors = () => {
     );
   };
 
-  const CategoryGrid: React.FC<any> = ({ categories }) => {
-  
-  
-    return (
-      <View style={styles.container}>
-  
-        {dataInChunks(categories, 3).map((row, index:any) => (
-          <View key={index} style={{ flexDirection: 'row', marginBottom: 15, marginTop: 15 }}>
-            {row.map((item:any) => (
-              
-              <CategoryBox key={index} item={item} />
-             
-              
-            ))}
-          </View>
-        ))}
-      
-  
-      </View>
-    );
-  };
+
   const ObjectBox: React.FC<CategoryBoxProps> = ({ item }:any) => {
     // const navigate = useStore(state => state.navigate);
   
     return (
       <TouchableOpacity style={styles.categoryBox} 
-      onPress={() => modalStore.openDetailsModal()}
+      onPress={() => {setObjectType(item); toggleModal()}}
       >
-             <View style={styles.categoryPhoto}></View>
+             <View style={styles.categoryPhoto}>
+              <FontAwesome name="photo" size={24} color="black" />
+             </View>
   
         <Text style={styles.categoryBoxText}>{item}</Text>
         <Text style={styles.categoryBoxTextSmall}>add details </Text>
@@ -198,7 +181,14 @@ const ByRoomsAndFloors = () => {
     );
   };
 
-  const ObjectGrid: React.FC<any> = ({ categories }) => {
+
+  
+  interface GridProps {
+    categories: string[];
+    BoxComponent: React.FC<CategoryBoxProps>;
+  }
+  
+  const Grid: React.FC<GridProps> = ({ categories, BoxComponent }) => {
   
   
     return (
@@ -208,21 +198,23 @@ const ByRoomsAndFloors = () => {
           <View key={index} style={{ flexDirection: 'row', marginBottom: 15, marginTop: 15 }}>
             {row.map((item:any) => (
               
-              <ObjectBox key={index} item={item} />
+              <BoxComponent key={index} item={item} />
              
               
             ))}
           </View>
         ))}
-      
   
       </View>
     );
   };
+
+  
+
   return (
     <ScrollView style={styles.container}>
 
-<AddDetailsModal visible={modalStore.isDetailsModalOpen} onClose={modalStore.closeDetailsModal} filterProps={filterProps}/>
+<AddDetailsModal visible={modalVisible} onClose={toggleModal} filterProps={filterProps}/>
    
  <View style={styles.upperContainer}>
     <View style={styles.upperContainerLeft}>
@@ -230,7 +222,7 @@ const ByRoomsAndFloors = () => {
     </View>
     <View style={styles.upperContainerRight}>
     {/* <Button title="Add Item" onPress={() => modalStore.openCategoryModal()} /> */}
-      <Text style={styles.upperContainerLargeText}>Rooms & Floors</Text>
+      <Text style={styles.upperContainerLargeText}>Rooms & Floors{selectedFloor}{selectedRoom}</Text>
       <Text style={styles.upperContainerSmallText}>Add items that are part of the property. Do this when you have access to the either the  items, receipts, manuals, product details or labels and the like.</Text>
     </View>
   </View>
@@ -238,20 +230,23 @@ const ByRoomsAndFloors = () => {
   <View style={styles.homeCategoriesContainer}>
     <Text style={styles.homeCategoriesText}>Select Rooms {Store.area} {selectCategory}</Text>
   </View>  
-  <Button title="Clear Filters" onPress={() => {Store.setArea(''); setSelectCategory('');}} />
+  <Button title="Clear Filters" onPress={() => {setSelectedFloor(''); setSelectedRoom(''); setSelectCategory('');}} />
   
-  {Store.area === '' 
+  {selectedFloor == '' 
   ?  
  <>
-  <Grid categories={rooms.map(i => i.name)} />
+  <Grid categories={rooms.map(i => i.name)} BoxComponent={RoomGridBox} />
   <View style={styles.homeCategoriesContainer}>
     <Text style={styles.homeCategoriesText}>Select Floors{Store.area}</Text>
   </View> 
-  <Grid categories={floors} />
+  <Grid categories={floors} BoxComponent={FloorGridBox}/>
  </>
   :
   <>
-  {selectCategory == ''? <CategoryGrid categories={categories}  /> : <ObjectGrid categories={objects.map(i => i.name)} />}
+  {selectCategory == ''?
+   <Grid categories={categories} BoxComponent={CategoryBox}/> 
+   : 
+   <Grid BoxComponent={ObjectBox} categories={objects.filter(object => object.category === selectCategory).map(object => object.name)} />}
   </>
   }
 
@@ -334,7 +329,9 @@ const styles = StyleSheet.create({
   categoryPhoto: { 
     width: 100,
     height: 100,
-    backgroundColor: 'blue',
+    backgroundColor: 'lightgrey',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   lowerContainer: {
     flex: 1,
