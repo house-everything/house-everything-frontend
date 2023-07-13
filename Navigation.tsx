@@ -174,9 +174,10 @@ const AuthenticationStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} /> */}
-        <Stack.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} />
+        <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} />
         <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
+        <Stack.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} />
+      
         <Stack.Screen options={{ headerShown: false }} name="PropertySearchResult" component={PropertySearchResult} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -188,7 +189,7 @@ const Navigation = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   return (
     <>
-      {!isAuthenticated ? <HomeStack /> : <AuthenticationStack /> }
+      {isAuthenticated ? <HomeStack /> : <AuthenticationStack /> }
     </>
   )
 }

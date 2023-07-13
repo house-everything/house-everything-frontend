@@ -4,101 +4,75 @@ import { useNavigation } from '@react-navigation/core'
 // import { FIREBASE_AUTH } from '../../firebaseConfig'
 // import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import auth from '@react-native-firebase/auth';
 
 
 
 const Login = () => {
 
-  // const auth = FIREBASE_AUTH;
-  // const [email, setEmail] = useState('')
-  // const [password, setPassword] = useState('')
-  // const [loading, setLoading] = useState(false)
-  // const navigation = useNavigation()
+  const [confirm, setConfirm] = useState<any>(null);
 
-  // const handleLogin = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await signInWithEmailAndPassword(auth, email, password);
-  //     console.log(response);
+  // verification code (OTP - One-Time-Passcode)
+  const [code, setCode] = useState('');
 
-  //   } catch (error) {
-  //     console.log('Sign In Failure: ' + error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
+  // Handle login
+  function onAuthStateChanged(user:any) {
+    if (user) {
+      
+      // Some Android devices can automatically process the verification code (OTP) message, and the user would NOT need to enter the code.
+      // Actually, if he/she tries to enter it, he/she will get an error message because the code was already used in the background.
+      // In this function, make sure you hide the component(s) for entering the code and/or navigate away from this screen.
+      // It is also recommended to display a message to the user informing him/her that he/she has successfully logged in.
+    console.log('oasc: ',user.uid)
+    }
+  }
 
-  // const handleSignUp = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await createUserWithEmailAndPassword(auth, email, password);
-  //     console.log(response);
-  //   } catch (error) {
-  //     console.log('Sign Up Failure: ' + error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-  
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  // Handle the button press
+  async function signInWithPhoneNumber(phoneNumber:any) {
+    const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    setConfirm(confirmation);
+  }
 
 
+  const [email, setEmail] = useState('test@gmail.com');
+  const [username, setUsername] = useState('username');
+  async function confirmCode() {
+    try {
+      console.log(code)
+      await confirm.confirm(code);
+      const user: any = auth().currentUser;
+
+      await user.updateEmail(email); // set user's email
+      await user.updateProfile({
+        displayName: username, // set "display name" as the user's username
+      });
+      console.log('success')
+    } catch (error) {
+      console.log('Invalid code.');
+    }
+  }
+
+  if (!confirm) {
+    return (
+      <Button
+        title="Phone Number Sign In"
+        onPress={() => signInWithPhoneNumber('+1 845-705-5261')}
+      />
+    );
+  }
 
   return (
-    <View
-    // style={styles.container}
-    // behavior="padding"
-  >
+    <View style={styles.container}>
+ 
     <View style={{marginTop: 100}}></View>
-        {/* <GooglePlacesAutocomplete
-              ref={ref}
-      placeholder='Search'
-      onPress={(data, details = null) => {
-        // 'details' is provided when fetchDetails = true
-        console.log(data, details);
-      }}
-      query={{
-        key: 'AIzaSyBLof95SYbAvaXcFMSC1eh2M9vxJrjv0rU',
-        language: 'en',
-      }}
-    /> */}
-   
-    {/* <View style={styles.inputContainer}>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={text => setEmail(text)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={text => setPassword(text)}
-        style={styles.input}
-        secureTextEntry
-      />
-    </View>
-
-    <View style={styles.buttonContainer}>
-      <TouchableOpacity
-        // onPress={handleLogin}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        // onPress={handleSignUp}
-        style={[styles.button, styles.buttonOutline]}
-      >
-        <Text style={styles.buttonOutlineText}>Register</Text>
-      </TouchableOpacity>
-      <Button
-      title='Sign Up'
-        onPress={() => handleSignUp()}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </Button>
-    </View> */}
+    <TextInput value={code} onChangeText={text => setCode(text)} />
+      <Button title="Confirm Code" onPress={() => confirmCode()} />
+      
   </View>
   )
 }
