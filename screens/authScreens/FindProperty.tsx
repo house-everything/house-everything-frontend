@@ -1,10 +1,12 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import useSearchStore from '../../stateStores/SearchStore';
+import useSearchStore from '../../stateStores/SignUpStore';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Header from '../../components/navigation/Header';
+import { TextInput } from "@react-native-material/core";
+import Button1 from '../../components/Button1';
 
 const FindProperty = ({ navigation } : any) => {
 
@@ -23,10 +25,12 @@ const FindProperty = ({ navigation } : any) => {
       <View style={styles.logoContainer}>
         <Text style={{fontSize: 24, }}>HOUSE EVERYTHING</Text>
       </View>
-
+    <Pressable onPress={() => navigation.navigate('Login')}>
+      <Text style={{marginLeft:'auto', marginRight: 'auto', marginTop: 50}}>Already have an account? Login here</Text>
+    </Pressable>
       <View style={{  paddingLeft: 20,
             paddingRight: 20,}}>
-        <Text style={{marginTop: 100, marginBottom: 20}}>Find Your Property</Text>
+        <Text style={{marginTop: 100, marginBottom: 20, fontSize: 30, fontWeight: 'bold', marginLeft: 'auto', marginRight: 'auto'}}>Find Your Property</Text>
       <GooglePlacesAutocomplete
         ref={ref}
         placeholder="Search"
@@ -64,7 +68,9 @@ const FindProperty = ({ navigation } : any) => {
           },
         }} 
       />
+      
       { <Text style={{marginTop: 100}}>{store.primarySearchResult}</Text>}
+      <Button1 title='press' onPress={() => navigation.navigate('PropertySearchResult')} />
       </View>
     </SafeAreaView>
   )

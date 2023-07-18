@@ -19,7 +19,7 @@ export default function App() {
 
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, }}>
     <PaperProvider theme={theme}>
       
       <Navigation/>

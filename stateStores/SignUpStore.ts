@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface SearchStore {
+interface SignUpStore {
   primarySearchResult: string
   secondarySearchResult: string
   setPrimarySearchResult: (primarySearchResult: string) => void
@@ -8,7 +8,7 @@ interface SearchStore {
 
 }
 
-const useSearchStore = create<SearchStore>((set) => ({
+const useSignUpStore = create<SignUpStore>((set) => ({
   primarySearchResult: '',
   secondarySearchResult: '',
   setPrimarySearchResult(text: string) {
@@ -25,4 +25,4 @@ const useSearchStore = create<SearchStore>((set) => ({
   },
 }))
 
-export default useSearchStore
+export default useSignUpStore

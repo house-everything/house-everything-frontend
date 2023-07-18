@@ -28,6 +28,7 @@ import StartDetails from './screens/detailsScreens/StartDetails';
 import ByLocations from './screens/detailsScreens/ByLocations';
 import ByObject from './screens/detailsScreens/ByObject';
 import ByRoomsAndFloors from './screens/detailsScreens/ByRoomsAndFloors';
+import ConfirmClaim from './screens/authScreens/ConfirmClaim';
 
 
 const Stack = createNativeStackNavigator();
@@ -174,10 +175,12 @@ const AuthenticationStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+      <Stack.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} />
+
         <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} />
         <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
-        <Stack.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} />
-      
+        <Stack.Screen options={{ headerShown: false }} name="ConfirmClaim" component={ConfirmClaim} />
+
         <Stack.Screen options={{ headerShown: false }} name="PropertySearchResult" component={PropertySearchResult} />
       </Stack.Navigator>
     </NavigationContainer>
