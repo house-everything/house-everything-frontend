@@ -6,24 +6,28 @@ import { SERVER_URL } from '@env';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Button1 from '../../components/Button1';
+import { ActivityIndicator } from "@react-native-material/core";
+import { set } from 'react-native-reanimated';
 
 const PropertySearchResult = ({ navigation } : any) => {
-
+  const store = useSignUpStore();
   const [propertyDetails, setPropertyDetails] = useState<any>([]);
   const [confirm, setConfirm] = useState<boolean>(true);
-  const [currentOwner, setCurrentOwner] = useState<boolean>(false);
-  const [primaryResidence, setPrimaryResidence] = useState<boolean>(false);
+  const [currentOwner, setCurrentOwner] = useState<boolean>(store.currentOwner);
+  const [primaryResidence, setPrimaryResidence] = useState<boolean>(store.primaryResidence);
   const getPropertyDetails = async () => {
     axios.get(SERVER_URL + 'http://localhost:8000/property_details').then((response) => {
       console.log(response.data);
     })
     console.log('url: ' + SERVER_URL);  
   }
-  const store = useSignUpStore();
+  
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const currentYear = new Date().getFullYear();
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(SERVER_URL + '/property_details', {
           params: {
@@ -33,7 +37,14 @@ const PropertySearchResult = ({ navigation } : any) => {
           }});
           // console.log(response.data.property.map((property: any) => property.building.rooms.beds));
           setPropertyDetails(response.data.property);
+          store.setBaths(response.data.property.map((property: any) => property.building.rooms.bathstotal));
+          store.setBeds(response.data.property.map((property: any) => property.building.rooms.beds));
+          store.setFullAddress(response.data.property.map((property: any) => property.address.oneLine))
+          // store.setSqft(response.data.property.map((property: any) => property.building.size.bldgsize));
+          store.setFloors(response.data.property.map((property: any) => property.building.summary.levels));
+          setLoading(false);
         } catch (error) {
+          setLoading(false);
           console.log(error);
         // setError(error.message);
       }
@@ -43,10 +54,12 @@ const PropertySearchResult = ({ navigation } : any) => {
   }, []);
 
   return (
-    <View>
+    <View >
 
       {/* <Text>PropertySearchResult</Text> */}
-      <View style={{ backgroundColor: 'blue', height: 200}}></View>
+      <View style={{ backgroundColor: '#6e869d', height: 200}}>
+        {!confirm && <Text style={{fontSize: 20, fontWeight: 'bold', marginTop: 50, padding: 20}}>{propertyDetails.map((property: any) => property.address.oneLine)}</Text>}
+      </View>
 
       {/* <Button title="Go back" onPress={() =>navigation.navigate('SignUp')} />
 
@@ -55,6 +68,7 @@ const PropertySearchResult = ({ navigation } : any) => {
      {confirm 
      ?
       <View style={{padding: 20}}>
+        {loading &&   <ActivityIndicator size="large"/>}
       {propertyDetails && propertyDetails.map((property: any, index: number) => {
       // console.log(`Rendering property ${index}`);
       return (
@@ -101,26 +115,30 @@ const PropertySearchResult = ({ navigation } : any) => {
       </View>
       <Text>Do you currently own this property?</Text>
       <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={[styles.button, {backgroundColor: currentOwner? '#7C106B' : 'white', borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => setCurrentOwner(true)}>
-          <Text style={[styles.buttonText, {color: currentOwner? 'white':'#7C106B' }]}>YES</Text>
+          <TouchableOpacity style={[styles.button, {backgroundColor: store.currentOwner? '#7C106B' : 'white', borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => store.setCurrentOwner(true)}>
+          <Text style={[styles.buttonText, {color: store.currentOwner? 'white':'#7C106B' }]}>YES</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, {backgroundColor: currentOwner? 'white':'#7C106B' , borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => setCurrentOwner(false)}>
-          <Text style={[styles.buttonText, {color: !currentOwner? 'white':'#7C106B' }]}>NO</Text>
+        <TouchableOpacity style={[styles.button, {backgroundColor: store.currentOwner? 'white':'#7C106B' , borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => store.setCurrentOwner(false)}>
+          <Text style={[styles.buttonText, {color: !store.currentOwner? 'white':'#7C106B' }]}>NO</Text>
         </TouchableOpacity>
       </View>
 
       <Text>Is it your primary residence?</Text>
         <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity style={[styles.button, {backgroundColor: primaryResidence? '#7C106B' : 'white', borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => setCurrentOwner(true)}>
-        <Text style={[styles.buttonText, {color: primaryResidence? 'white':'#7C106B' }]}>YES</Text>
+        <TouchableOpacity style={[styles.button, {backgroundColor: store.primaryResidence? '#7C106B' : 'white', borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => store.setPrimaryResidence(true)}>
+        <Text style={[styles.buttonText, {color: store.primaryResidence? 'white':'#7C106B' }]}>YES</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, {backgroundColor: primaryResidence? 'white':'#7C106B' , borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => setCurrentOwner(false)}>
-        <Text style={[styles.buttonText, {color: !primaryResidence? 'white':'#7C106B' }]}>NO</Text>
+      <TouchableOpacity style={[styles.button, {backgroundColor: store.primaryResidence? 'white':'#7C106B' , borderWidth: 2, borderColor: '#7C106B'}]} onPress={() => store.setPrimaryResidence(false)}>
+        <Text style={[styles.buttonText, {color: !store.primaryResidence? 'white':'#7C106B' }]}>NO</Text>
       </TouchableOpacity>
         </View>
-        <Button1 title='Claim it' onPress={() => navigation.navigate('SignUp')} />
+        <Button1  title='Claim it'
+                 onPress={() => navigation.navigate('PropertySetup')} 
+
+        //  onPress={() => navigation.navigate('SignUp')} 
+         />
         </>
         );
       })}
@@ -136,7 +154,8 @@ const styles = StyleSheet.create({
   smallText: {
   fontSize: 16,
   // padding: 2,
-  marginVertical: 5
+  marginVertical: 5,
+  color: '#576c81'
   },
   button: {
     backgroundColor: '#7C106B',

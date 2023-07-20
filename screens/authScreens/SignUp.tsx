@@ -30,7 +30,7 @@ const schema = yup.object().shape({
   email: yup.string().required(),
 });
 
-const SignUp = () => {
+const SignUp = ({navigation}: any) => {
   
   const store = useSignUpStore();
   const [confirm, setConfirm] = useState<any>(null);
@@ -100,7 +100,12 @@ const SignUp = () => {
       await user.updateProfile({
         displayName: username, // set "display name" as the user's username
       });
-      Alert.alert(`Logged in!, user id:  `+ user.uid);
+      try {
+        await AsyncStorage.setItem('UID', user.uid);
+      } catch (e) {
+      }
+      navigation.navigate('PropertySetup');
+
     } catch (error) {
       console.log('Invalid code.');
     }
@@ -111,6 +116,7 @@ const SignUp = () => {
   });
   const onSubmit = (data: FormValues) => {
     console.log(data);
+    store.setFirstName(data.firstName);
     setModalVisible(!modalVisible)
     signInWithPhoneNumber(`+1` + data.mobileNumber.toString())
     // sendItemDetails({...data,...dataValues}, actualImage);  
@@ -199,7 +205,12 @@ const SignUp = () => {
           <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
-          <TextInputMUI variant="outlined" label='First Name' style={[ {width: 120, marginTop: 10}]} value={value} onChangeText={onChange} />
+          <TextInputMUI 
+            variant="outlined" 
+            label='First Name' 
+            style={[ {width: 120, marginTop: 10}]} 
+            value={value} 
+            onChangeText={onChange} />
           )}
           name="firstName"
         />

@@ -29,7 +29,7 @@ const FindProperty = ({ navigation } : any) => {
       <Text style={{marginLeft:'auto', marginRight: 'auto', marginTop: 50}}>Already have an account? Login here</Text>
     </Pressable>
       <View style={{  paddingLeft: 20,
-            paddingRight: 20,}}>
+            paddingRight: 20, zIndex: 3000}}>
         <Text style={{marginTop: 100, marginBottom: 20, fontSize: 30, fontWeight: 'bold', marginLeft: 'auto', marginRight: 'auto'}}>Find Your Property</Text>
       <GooglePlacesAutocomplete
         ref={ref}
@@ -47,6 +47,7 @@ const FindProperty = ({ navigation } : any) => {
           language: 'en',
         }}
         styles={{
+          zIndex: 3000,
           description: {
             fontWeight: 'bold',
           },
@@ -55,23 +56,27 @@ const FindProperty = ({ navigation } : any) => {
           },
           listView: {
             color: 'black', //To see where exactly the list is
-            zIndex: 1000, //To popover the component outwards
+            zIndex: 3000, //To popover the component outwards
             position: 'absolute',
             marginTop: 40,
             // paddingLeft: 20,
             // paddingRight: 20,
           },
           textInputContainer: {
-            zIndex: 1000,
+            zIndex: 3000,
             position: 'absolute',
           
           },
         }} 
       />
       
-      { <Text style={{marginTop: 100}}>{store.primarySearchResult}</Text>}
-      <Button1 title='press' onPress={() => navigation.navigate('PropertySearchResult')} />
+  
       </View>
+      <View style={{padding: 20, marginTop: 100}}>
+        {/* { <Text style={{marginTop: 100, textAlign: 'center'}}>{store.primarySearchResult}</Text>} */}
+        <Button1 title='press' onPress={() => navigation.navigate('PropertySearchResult')} />
+      </View>
+   
     </SafeAreaView>
   )
 }
