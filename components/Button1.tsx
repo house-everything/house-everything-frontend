@@ -18,14 +18,15 @@ export default Button1
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#7C106B',
-    width: 180,
+    // width: 180,
+    width: "100%",
     marginLeft: 'auto',
     marginRight: 'auto',
     padding: 15,
     alignItems: 'center',
     marginTop: 20,
    
-    borderRadius: 20,
+    borderRadius: 10,
   },
   buttonOutline: {
     backgroundColor: 'white',

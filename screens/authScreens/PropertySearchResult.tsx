@@ -35,13 +35,13 @@ const PropertySearchResult = ({ navigation } : any) => {
             address2: store.secondarySearchResult,
             // add more parameters here
           }});
-          // console.log(response.data.property.map((property: any) => property.building.rooms.beds));
+          // console.log(response.data.property.map((property: any) => property.building.summary.levels));
           setPropertyDetails(response.data.property);
-          store.setBaths(response.data.property.map((property: any) => property.building.rooms.bathstotal));
+          store.setBaths(response.data.property.map((property: any) => {return property.building.rooms.bathstotal}));
           store.setBeds(response.data.property.map((property: any) => property.building.rooms.beds));
           store.setFullAddress(response.data.property.map((property: any) => property.address.oneLine))
           // store.setSqft(response.data.property.map((property: any) => property.building.size.bldgsize));
-          store.setFloors(response.data.property.map((property: any) => property.building.summary.levels));
+          store.setFloors(response.data.property.map((property: any) => {return property.building.summary.levels}));
           setLoading(false);
         } catch (error) {
           setLoading(false);
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
    
-    borderRadius: 20,
+    borderRadius: 10,
   },
   buttonOutline: {
     backgroundColor: 'white',

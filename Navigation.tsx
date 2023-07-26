@@ -30,6 +30,7 @@ import ByObject from './screens/detailsScreens/ByObject';
 import ByRoomsAndFloors from './screens/detailsScreens/ByRoomsAndFloors';
 import ConfirmClaim from './screens/authScreens/ConfirmClaim';
 import PropertySetup from './screens/authScreens/PropertySetup';
+import UserSetup from './screens/authScreens/UserSetup';
 
 
 const Stack = createNativeStackNavigator();
@@ -44,7 +45,6 @@ const navTheme = {
   },
 };
 
-// import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, } from '@react-navigation/drawer';
 
 const DetailsStack = createNativeStackNavigator();
 
@@ -175,10 +175,11 @@ const DrawerStack = () => {
 const AuthenticationStack = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-      <Stack.Screen options={{ headerShown: false }} name="PropertySetup" component={PropertySetup} />
-      <Stack.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} />
-
+      <Stack.Navigator> 
+   
+        <Stack.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} />
+        <Stack.Screen options={{ headerShown: false }} name="UserSetup" component={UserSetup} />
+        <Stack.Screen options={{ headerShown: false }} name="PropertySetup" component={PropertySetup} />
         <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} />
         <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
         <Stack.Screen options={{ headerShown: false }} name="ConfirmClaim" component={ConfirmClaim} />
@@ -193,9 +194,33 @@ const AuthenticationStack = () => {
 
 const Navigation = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [appIsReady, setAppIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    async function prepare() {
+      try {
+        
+     
+        await new Promise(resolve => setTimeout(resolve, 2000));
+       
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setAppIsReady(true);
+      }
+    }
+    prepare();
+  
+  },[])
+   
   return (
     <>
-      {isAuthenticated ? <HomeStack /> : <AuthenticationStack /> }
+    {/* // {!appIsReady ? 
+    // <Text>Loading...</Text> 
+    
+    // : <Text>App is ready!</Text>
+    // } */}
+      {isAuthenticated ? <HomeStack /> : <AuthenticationStack /> } 
     </>
   )
 }

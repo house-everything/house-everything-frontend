@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/WHIRLPOOL_LOGO.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain"
     },
     "assetBundlePatterns": [

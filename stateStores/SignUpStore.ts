@@ -1,3 +1,4 @@
+import { floor } from 'react-native-reanimated'
 import { create } from 'zustand'
 
 interface SignUpStore {
@@ -12,9 +13,9 @@ interface SignUpStore {
   setFullAddress: (fullAddress: string) => void
   setCurrentOwner: (currentOwner: boolean) => void
   setPrimaryResidence: (primaryResidence: boolean) => void
-  setFloors: (floors: number) => void
-  setBeds: (beds: number) => void
-  setBaths: (baths: number) => void
+  setFloors: (floors: number[]) => void
+  setBeds: (beds: number[]) => void
+  setBaths: (baths: number[]) => void
   primarySearchResult: string
   secondarySearchResult: string
   setPrimarySearchResult: (primarySearchResult: string) => void
@@ -23,9 +24,9 @@ interface SignUpStore {
 }
 
 const useSignUpStore = create<SignUpStore>((set) => ({
-  floors: 5,
-  beds: 3,
-  baths: 2,
+  floors: 1,
+  beds: 1,
+  baths: 1,
   currentOwner: true,
   primaryResidence: true,
   fullAddress: '',
@@ -56,22 +57,29 @@ const useSignUpStore = create<SignUpStore>((set) => ({
       primaryResidence: primaryResidence,
     }))
   },
-  setFloors(floors: number) { 
+  setFloors(floors: number[]) { 
+
     set((state) => ({
       ...state,
-      floors: floors,
+      floors: floors[0],
     }))
   },
-  setBeds(beds: number) {
+  setBeds(beds: number[]) {
+  
+    // let bedInt = parseInt(JSON.stringify(beds))
+    // console.log('beds',typeof bedInt, beds[0])
     set((state) => ({
       ...state,
-      beds: beds,
+      beds: beds[0],
     }))
   },
-  setBaths(baths: number) {
+  setBaths(baths: number[]) {
+    
+    // let bathInt = parseInt(JSON.stringify(baths))
+    // console.log('baths ',typeof bathInt, bathInt, baths)
     set((state) => ({
       ...state,
-      baths: baths,
+      baths: baths[0],
     }))
   },
   setPrimarySearchResult(text: string) {
