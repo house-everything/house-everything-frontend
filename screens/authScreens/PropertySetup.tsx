@@ -43,8 +43,94 @@ const PropertySetup = () => {
   ////
 
   /// step 4 
-  const [bedroomDetails, setBedroomDetails] = useState(Array(bedSliderValue).fill({ roomName: '', floorName: '' }));
+  interface RoomDetails {
+    roomName: string;
+    floorName: string | null;
+    roomNumber: string;
+  }
+
+  // from step 3, the slider values are then ran through this function to create an array of objects
+  // of room details
+  // every room type will have its seperate state but with the same object structure
+  // once the form is submitted the seperate arrays will be joined together and sent to the server
+  // as the rooms array
+
+// bedroom
+  const initialBedroomDetails: RoomDetails[] = new Array(bedSliderValue).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `bed${index}`
+  }));
+
+  const [bedroomDetails, setBedroomDetails] = useState<RoomDetails[]>(initialBedroomDetails);
+
   const [open, setOpen] = useState(Array(bedroomDetails.length).fill(false));
+
+// bathroom
+  const initialBathDetails: RoomDetails[] = new Array(bathSliderValue).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `bath${index}`
+  }));
+
+  const [bathDetails, setBathDetails] = useState<RoomDetails[]>(initialBathDetails);
+
+  const [openBath, setBathOpen] = useState(Array(bathDetails.length).fill(false));
+
+// living rooms
+
+const initialLivingroomDetails: RoomDetails[] = new Array(laundryRooms).fill(null).map((_, index) => ({
+  roomName: '',
+  floorName: null,
+  roomNumber: `livingroom${index}`
+}));
+
+const [livingroomDetails, setLivingroomDetails] = useState<RoomDetails[]>(initialLivingroomDetails);
+
+const [openLivingroom, setLivingroomOpen] = useState(Array(livingroomDetails.length).fill(false));
+
+// kitchens
+
+const initialKitchenDetails: RoomDetails[] = new Array(kitchens).fill(null).map((_, index) => ({
+  roomName: '',
+  floorName: null,
+  roomNumber: `kitchen${index}`
+}));
+
+const [kitchenDetails, setKitchenDetails] = useState<RoomDetails[]>(initialKitchenDetails);
+const [openKitchen, setKitchenOpen] = useState(Array(kitchenDetails.length).fill(false));
+
+// family rooms
+const initialFamilyroomDetails: RoomDetails[] = new Array(familyRooms).fill(null).map((_, index) => ({
+  roomName: '',
+  floorName: null,
+  roomNumber: `familyroom${index}`
+}));
+
+const [familyroomDetails, setFamilyroomDetails] = useState<RoomDetails[]>(initialFamilyroomDetails);
+const [openFamilyroom, setFamilyroomOpen] = useState(Array(familyroomDetails.length).fill(false));
+
+
+// laundry rooms
+const initialLaundryroomDetails: RoomDetails[] = new Array(laundryRooms).fill(null).map((_, index) => ({
+  roomName: '',
+  floorName: null,
+  roomNumber: `laundryroom${index}`
+}));
+
+const [laundryroomDetails, setLaundryroomDetails] = useState<RoomDetails[]>(initialLaundryroomDetails);
+const [openLaundryroom, setLaundryroomOpen] = useState(Array(laundryroomDetails.length).fill(false));
+
+// foyer entrance
+const initialFoyerentranceDetails: RoomDetails[] = new Array(foyerEntrance).fill(null).map((_, index) => ({
+  roomName: '',
+  floorName: null,
+  roomNumber: `foyerentrance${index}`
+}));
+
+const [foyerentranceDetails, setFoyerentranceDetails] = useState<RoomDetails[]>(initialFoyerentranceDetails);
+const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDetails.length).fill(false));
+
 
   const handleNameChange = (index: number, text: string) => {
     let newRoomDetails = [...bedroomDetails];
@@ -52,14 +138,104 @@ const PropertySetup = () => {
     setBedroomDetails(newRoomDetails);
   };
   
-  const handleFloorChange = (index: number, floorName: string) => {
-   console.log(index, floorName);
+  const handleFloorChange = (index: number, value: string): void => {
+    console.log(index, value)
     let newRoomDetails = [...bedroomDetails];
-    newRoomDetails[index].floorName = floorName;
-    console.log(newRoomDetails);
+    newRoomDetails[index].floorName = value;
     setBedroomDetails(newRoomDetails);
   };
 
+  const handleNameChangeBath = (index: number, text: string) => {
+    let newRoomDetails = [...bathDetails];
+    newRoomDetails[index].roomName = text;
+    setBathDetails(newRoomDetails);
+  };
+  
+  const handleFloorChangeBath = (index: number, value: string): void => {
+    console.log(index, value)
+    let newBathDetails = [...bathDetails];
+    newBathDetails[index].floorName = value;
+    setBathDetails(newBathDetails);
+  };
+
+  const handleNameChangeLivingroom = (index: number, text: string) => {
+    let newRoomDetails = [...livingroomDetails];
+    newRoomDetails[index].roomName = text;
+    setLivingroomDetails(newRoomDetails);
+  };
+
+  const handleFloorChangeLivingroom = (index: number, value: string): void => {
+    console.log(index, value)
+    let newRoomDetails = [...livingroomDetails];
+    newRoomDetails[index].floorName = value;
+    setLivingroomDetails(newRoomDetails);
+  };
+
+  const handleNameChangeKitchen = (index: number, text: string) => {
+    let newRoomDetails = [...kitchenDetails];
+    newRoomDetails[index].roomName = text;
+    setKitchenDetails(newRoomDetails);
+  };
+
+  const handleFloorChangeKitchen = (index: number, value: string): void => {
+    console.log(index, value)
+    let newRoomDetails = [...kitchenDetails];
+    newRoomDetails[index].floorName = value;
+    setKitchenDetails(newRoomDetails);
+  };
+
+  const handleNameChangeFamilyroom = (index: number, text: string) => {
+    let newRoomDetails = [...familyroomDetails];
+    newRoomDetails[index].roomName = text;
+    setFamilyroomDetails(newRoomDetails);
+  };
+
+  const handleFloorChangeFamilyroom = (index: number, value: string): void => {
+    console.log(index, value)
+    let newRoomDetails = [...familyroomDetails];
+    newRoomDetails[index].floorName = value;
+    setFamilyroomDetails(newRoomDetails);
+  };
+
+  const handleNameChangeLaundryroom = (index: number, text: string) => {
+    let newRoomDetails = [...laundryroomDetails];
+    newRoomDetails[index].roomName = text;
+    setLaundryroomDetails(newRoomDetails);
+  };
+
+  const handleFloorChangeLaundryroom = (index: number, value: string): void => {
+    console.log(index, value)
+    let newRoomDetails = [...laundryroomDetails];
+    newRoomDetails[index].floorName = value;
+    setLaundryroomDetails(newRoomDetails);
+  };
+
+  const handleNameChangeFoyerentrance = (index: number, text: string) => {
+    let newRoomDetails = [...foyerentranceDetails];
+    newRoomDetails[index].roomName = text;
+    setFoyerentranceDetails(newRoomDetails);
+  };
+
+  const handleFloorChangeFoyerentrance = (index: number, value: string): void => {
+    console.log(index, value)
+    let newRoomDetails = [...foyerentranceDetails];
+    newRoomDetails[index].floorName = value;
+    setFoyerentranceDetails(newRoomDetails);
+  };
+
+
+
+  // const handleFloorChange = (selectedValue: any): void => {
+  //   // console.log( selectedValue)
+  //   // let newRoomDetails = [...bedroomDetails];
+  //   // newRoomDetails[index].floorName = value;
+  //   // setBedroomDetails(newRoomDetails);
+  // };
+  const [testDropdownValues, setTestDropdownValues] = useState([
+    {label: 'Level 1', value: 'Level 1'},
+    {label: 'Level 2', value: 'Level 2'},
+    {label: 'Level 3', value: 'Level 3'},
+  ])
   
   const [selectedLanguage, setSelectedLanguage] = useState();
 
@@ -140,12 +316,8 @@ const PropertySetup = () => {
     newFloors[index].floorName = event.nativeEvent.text;
     setFloors(newFloors);
   };
-
-  const testDropdownValues = [
-    {label: 'Level 1', value: 'Level 1'},
-    {label: 'Level 2', value: 'Level 2'},
-    {label: 'Level 3', value: 'Level 3'},
-  ]
+ 
+ 
   return (
     <View style={styles.container}>
       <View style={styles.upperContainer}>
@@ -164,7 +336,7 @@ const PropertySetup = () => {
        
  { step === 1 ? (
       <>
-      <Button1 title="Print" onPress={() => console.log(floors)} />
+      {/* <Button1 title="Print" onPress={() => console.log(floors)} /> */}
            <View style={{width: '100%',  backgroundColor: '#d1d1d1'}}>
             <Text style={styles.mediumText}>Set-up Property Profile</Text>
            </View>
@@ -387,20 +559,208 @@ const PropertySetup = () => {
      <View style={{width: '100%', backgroundColor: '#d1d1d1', zIndex: 1000}}>
        <Text style={styles.mediumText}>Name the rooms & assign them to floors</Text>
      </View>
-     <Button1 title="Print" onPress={() => console.log(bedroomDetails)} />
+     <Button1 title="Print" onPress={() => console.log(bedroomDetails, bathDetails)} />
     <ScrollView nestedScrollEnabled={true} style={{padding: 20}}>
       <Pressable onPress={prevStep} style={{width: 30, height:30}}>
        <MaterialCommunityIcons name="chevron-left" size={24} color="black" />
       </Pressable>
-      {bedroomDetails.map((room, index) => (
-  <View style={[styles.row, {height: 150}]} key={index}>
+  {bedroomDetails.map((room, index) => (
+  <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
     <TextInputMUI
      variant='outlined' 
-      placeholder={`Room ${index + 1} name`}
-      
-      style={{marginBottom: 10, width: 150}} 
+      placeholder={`Bedroom ${index + 1}`}
+      inputContainerStyle={{height: 50,  }}
+      inputStyle={{paddingBottom: 5, fontSize: 18}}
+      style={{marginBottom: 10, width: 150,}} 
       onChangeText={(text) => handleNameChange(index, text)}
     />
+
+  {/* <Text onPress={()=> console.log(bedroomDetails[index].floorName)}>{20 - index}</Text> */}
+ 
+  <View style={styles.dropdownContainer}>
+  <DropDownPicker
+    style={{width: 150, borderRadius: 0, zIndex: open[index]? 300 : 0,}}
+    dropDownDirection="TOP"
+    dropDownContainerStyle={{ elevation: open[index]? 300 : 0, width: 150 }}
+    items={testDropdownValues}
+    setItems={setTestDropdownValues}
+    setValue={() => handleFloorChange}
+    onSelectItem={(item) => {
+      handleFloorChange(index, `${item.value}`);
+    }}
+    onChangeValue={(value) => {
+      console.log(value);
+    }}
+    value={room.floorName}
+    // setValue={() => handleFloorChange(index, `${bedroomDetails[index].floorName}`) }
+    open={open[index]}
+    setOpen={(isOpen: any) => {
+      let newOpen = [...open];
+      newOpen[index] = isOpen;
+      setOpen(newOpen);
+    }}
+/>
+ 
+</View>
+
+  
+  </View>
+))}
+
+{/* BATHROOM */}
+  {bathDetails.map((room, index) => (
+    <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
+      <TextInputMUI
+      variant='outlined' 
+        placeholder={`Bathroom ${index + 1} `}
+        inputContainerStyle={{height: 50,  }}
+        inputStyle={{paddingBottom: 5, fontSize: 18}}
+        style={{marginBottom: 10, width: 150,}} 
+        onChangeText={(text) => handleNameChangeBath(index, text)}
+      />
+  
+    <View style={styles.dropdownContainer}>
+      <DropDownPicker
+        style={{width: 150, borderRadius: 0, zIndex: openBath[index]? 300 : 0,}}
+        dropDownDirection="TOP"
+        dropDownContainerStyle={{ elevation: openBath[index]? 300 : 0, width: 150 }}
+        items={testDropdownValues}
+        setItems={setTestDropdownValues}
+        setValue={() => handleFloorChangeBath}
+        onSelectItem={(item) => {
+          handleFloorChangeBath(index, `${item.value}`);
+        }}
+        onChangeValue={(value) => {
+          console.log(value);
+        }}
+        value={room.floorName}
+        open={openBath[index]}
+        setOpen={(isOpen: any) => {
+          let newOpen = [...openBath];
+          newOpen[index] = isOpen;
+          setBathOpen(newOpen);
+        }}
+      />
+    </View>
+  </View>
+  ))}
+
+{/* LIVING ROOM */}
+{livingroomDetails.map((room, index) => (
+    <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
+      <TextInputMUI
+      variant='outlined' 
+        placeholder={`Livingroom ${index + 1} `}
+        inputContainerStyle={{height: 50,  }}
+        inputStyle={{paddingBottom: 5, fontSize: 18}}
+        style={{marginBottom: 10, width: 150,}} 
+        onChangeText={(text) => handleNameChangeLivingroom(index, text)}
+      />
+  
+    <View style={styles.dropdownContainer}>
+      <DropDownPicker
+        style={{width: 150, borderRadius: 0, zIndex: openLivingroom[index]? 300 : 0,}}
+        dropDownDirection="TOP"
+        dropDownContainerStyle={{ elevation: openLivingroom[index]? 300 : 0, width: 150 }}
+        items={testDropdownValues}
+        setItems={setTestDropdownValues}
+        setValue={() => handleFloorChangeLivingroom}
+        onSelectItem={(item) => {
+          handleFloorChangeLivingroom(index, `${item.value}`);
+        }}
+        onChangeValue={(value) => {
+          console.log(value);
+        }}
+        value={room.floorName}
+        open={openLivingroom[index]}
+        setOpen={(isOpen: any) => {
+          let newOpen = [...openLivingroom];
+          newOpen[index] = isOpen;
+          setLivingroomOpen(newOpen);
+        }}
+      />
+    </View>
+  </View>
+  ))}
+
+{/* KITCHEN */}
+{kitchenDetails.map((room, index) => (
+    <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
+      <TextInputMUI
+        variant='outlined' 
+        placeholder={`Kitchen ${index + 1} `}
+        inputContainerStyle={{height: 50,  }}
+        inputStyle={{paddingBottom: 5, fontSize: 18}}
+        style={{marginBottom: 10, width: 150,}} 
+        onChangeText={(text) => handleNameChangeKitchen(index, text)}
+      />
+  
+    <View style={styles.dropdownContainer}>
+      <DropDownPicker
+        style={{width: 150, borderRadius: 0, zIndex: openKitchen[index]? 300 : 0,}}
+        dropDownDirection="TOP"
+        dropDownContainerStyle={{ elevation: openKitchen[index]? 300 : 0, width: 150 }}
+        items={testDropdownValues}
+        setItems={setTestDropdownValues}
+        setValue={() => handleFloorChangeKitchen}
+        onSelectItem={(item) => {
+          handleFloorChangeKitchen(index, `${item.value}`);
+        }}
+        onChangeValue={(value) => {
+          console.log(value);
+        }}
+        value={room.floorName}
+        open={openKitchen[index]}
+        setOpen={(isOpen: any) => {
+          let newOpen = [...openKitchen];
+          newOpen[index] = isOpen;
+          setKitchenOpen(newOpen);
+        }}
+      />
+    </View>
+  </View>
+  ))}
+
+{/* FAMILY ROOM */}
+{familyroomDetails.map((room, index) => (
+    <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
+      <TextInputMUI
+      variant='outlined' 
+        placeholder={`Familyroom ${index + 1} `}
+        inputContainerStyle={{height: 50,  }}
+        inputStyle={{paddingBottom: 5, fontSize: 18}}
+        style={{marginBottom: 10, width: 150,}} 
+        onChangeText={(text) => handleNameChangeBath(index, text)}
+      />
+  
+    <View style={styles.dropdownContainer}>
+      <DropDownPicker
+        style={{width: 150, borderRadius: 0, zIndex: openBath[index]? 300 : 0,}}
+        dropDownDirection="TOP"
+        dropDownContainerStyle={{ elevation: openBath[index]? 300 : 0, width: 150 }}
+        items={testDropdownValues}
+        setItems={setTestDropdownValues}
+        setValue={() => handleFloorChangeBath}
+        onSelectItem={(item) => {
+          handleFloorChangeBath(index, `${item.value}`);
+        }}
+        onChangeValue={(value) => {
+          console.log(value);
+        }}
+        value={room.floorName}
+        open={openBath[index]}
+        setOpen={(isOpen: any) => {
+          let newOpen = [...openBath];
+          newOpen[index] = isOpen;
+          setBathOpen(newOpen);
+        }}
+      />
+    </View>
+  </View>
+  ))}
+
+{/* LAUNDRY ROOM */}
+
     {/* <View style={{width: 150,}}>  
     <Picker
     // selectedValue={bedroomDetails[index].floorName}
@@ -412,38 +772,6 @@ const PropertySetup = () => {
       }
   </Picker>
   </View> */}
-  <Text onPress={()=> console.log(room)}>{20 - index}</Text>
-  { Platform.OS === 'ios' ? 
-  <View style={styles.dropdownContainer}>
-    <DropDownPicker
-      style={{width: 150, }}
-      dropDownDirection="BOTTOM"
-      // zIndex={3000 + index} 
-      // zIndexInverse={3000 - index}
-      dropDownContainerStyle={{
-      
-        elevation: open[index]? 300 : 0,
-       
-
-        width: 150,
-       
-      }}
-      items={testDropdownValues}
-      value={room.floorName}
-      setValue={(value:any) => console.log(index, value)}
-      open={open[index]}
-      setOpen={(isOpen) => {
-        let newOpen = [...open];
-        newOpen[index] = isOpen;
-        setOpen(newOpen);
-      }}
-    /> 
-</View>
-    : <></>
-}
-  
-  </View>
-))}
         {/* {Array.from({length: bedSliderValue}, (_, index) =>  { 
           return (
         <>
@@ -530,11 +858,11 @@ const styles = StyleSheet.create({
     padding: 8
   },
   dropdownContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent:'space-between',
-    width: 200,
-    zIndex: 300,
-    marginBottom: 30
+    // display: 'flex',
+    // flexDirection: 'row',
+    // justifyContent:'space-between',
+    // width: 200,
+    // zIndex: 300,
+    marginBottom: 15,
   },
 })

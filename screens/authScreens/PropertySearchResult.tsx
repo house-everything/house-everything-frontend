@@ -29,7 +29,7 @@ const PropertySearchResult = ({ navigation } : any) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(SERVER_URL + '/property_details', {
+        const response = await axios.get('https://honest-linen-production.up.railway.app/property_details', {
           params: {
             address1: store.primarySearchResult,
             address2: store.secondarySearchResult,
