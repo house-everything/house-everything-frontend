@@ -1,29 +1,39 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import BarcodeScanner from '../components/BarcodeScanner'
 import useUserDetailsStore from '../stateStores/userDetailsStore'
+import useSignUpStore from '../stateStores/SignUpStore'
 
 const Portfolio = ({navigation}:any) => {
   const userDetails = useUserDetailsStore();
-
+  const userStore = useSignUpStore();
   return (
     <ScrollView style={styles.pageContainer}>
       <Text style={styles.welcomeText}>
-        Welcome {userDetails.firstName}.
+        Welcome {userStore.firstName}.
       </Text>
       
       <View style={styles.contentRow}>
 
         <View style={styles.upperRowContainer}>
-          <View style={styles.completeProfilePhoto}/>
-          <Text style={styles.largeText}>{userDetails.firstName}'s Portfolio</Text>
+          {userStore.userImage
+          ? 
+          <Image source={{ uri: userStore.userImage }} style={{ width: 90, height: 90, borderRadius: 50, marginBottom: 10 }}/>
+          :
+<View style={styles.completeProfilePhoto}/>          }
+          <Text style={styles.largeText}>{userStore.firstName}'s Portfolio</Text>
           <Text style={styles.smallText}>Add/edit details</Text>
         </View>
         
         <Pressable onPress={() => navigation.navigate('Details')}>
         <View style={styles.upperRowContainer}>
         
-          <View style={styles.completeProfilePhoto}/>
+          {userStore.propertyImage
+          ? 
+          <Image source={{ uri: userStore.propertyImage }} style={{ width: 90, height: 90, borderRadius: 50, marginBottom: 10 }}/>
+          :
+          <View style={styles.completeProfilePhoto}/>          
+          }
           <Text style={styles.largeText}>Property details</Text>
           <Text style={styles.smallText}>Add/edit details</Text>
 

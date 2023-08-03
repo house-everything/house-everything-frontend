@@ -1,4 +1,4 @@
-import { Image, Pressable, ScrollView, StyleSheet, Text, View, Platform } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, Platform, KeyboardAvoidingView, Keyboard} from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm, Controller, set } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -18,7 +18,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import {Picker} from '@react-native-picker/picker';
 
 
-const PropertySetup = () => {
+const PropertySetup = ({navigation}:any) => {
 
   const store = useSignUpStore();
   const [appIsReady, setAppIsReady] = useState(false);
@@ -28,19 +28,46 @@ const PropertySetup = () => {
   const [floorSliderValue, setFloorSliderValue] = useState<number>(store.floors);
   const [bedSliderValue, setBedSliderValue] = useState(store.beds);
   const [bathSliderValue, setBathSliderValue] = useState(store.baths);
-  const [floors, setFloors] = useState(Array(floorSliderValue).fill({ floorNumber: 0, floorName: '' }));
+  const [floors, setFloors] = useState(Array(floorSliderValue).fill({}));
   const [livingRooms, setLivingRooms] = useState(0);
   const [kitchens, setKitchens] = useState(0);
   const [familyRooms, setFamilyRooms] = useState(0);
   const [laundryRooms, setLaundryRooms] = useState(0);
   const [foyerEntrance, setFoyerEntrance] = useState(0);
+  const [keyboardActive, setKeyboardActive] = useState(false);
 
   ////
   const [roomNames, setRoomNames] = useState(Array(bedSliderValue).fill(''));
   // const [open, setOpen] = useState(Array(bedSliderValue).fill(false));
   const [values, setValues] = useState(Array(bedSliderValue).fill(''));
 
-  ////
+  //// keyboard listener
+  useEffect(() => {
+   
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardActive(true);
+    });
+
+ 
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardActive(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+
+  useEffect(() => {
+    const newFloors = Array.from({ length: floorSliderValue }, (_, index) => ({ value: `floor${index}`, label: '' }));
+    setFloors(newFloors);
+  }, [floorSliderValue]);
+
+
+  const floorsDropdownOptions = floors.map((floor, index) => ({ label: `${floor.floorName}`, value: `floor${index}` }));
+  const [testDropdownValues, setTestDropdownValues] = useState(floorsDropdownOptions);
 
   /// step 4 
   interface RoomDetails {
@@ -56,82 +83,112 @@ const PropertySetup = () => {
   // as the rooms array
 
 // bedroom
+const [bedroomDetails, setBedroomDetails] = useState<RoomDetails[]>([]);
+
+const [open, setOpen] = useState(Array(bedroomDetails.length).fill(false));
+useEffect(() => {
   const initialBedroomDetails: RoomDetails[] = new Array(bedSliderValue).fill(null).map((_, index) => ({
     roomName: '',
     floorName: null,
     roomNumber: `bed${index}`
   }));
 
-  const [bedroomDetails, setBedroomDetails] = useState<RoomDetails[]>(initialBedroomDetails);
+  setBedroomDetails(initialBedroomDetails);
+  setOpen(new Array(bedSliderValue).fill(false));
 
-  const [open, setOpen] = useState(Array(bedroomDetails.length).fill(false));
+}, [bedSliderValue]);
 
 // bathroom
+const [bathDetails, setBathDetails] = useState<RoomDetails[]>([]);
+const [openBath, setBathOpen] = useState(Array(bathDetails.length).fill(false));
+useEffect(() => {
   const initialBathDetails: RoomDetails[] = new Array(bathSliderValue).fill(null).map((_, index) => ({
     roomName: '',
     floorName: null,
     roomNumber: `bath${index}`
   }));
 
-  const [bathDetails, setBathDetails] = useState<RoomDetails[]>(initialBathDetails);
-
-  const [openBath, setBathOpen] = useState(Array(bathDetails.length).fill(false));
+  setBathDetails(initialBathDetails);
+  setBathOpen(new Array(bathSliderValue).fill(false));
+}, [bathSliderValue]);
 
 // living rooms
 
-const initialLivingroomDetails: RoomDetails[] = new Array(laundryRooms).fill(null).map((_, index) => ({
-  roomName: '',
-  floorName: null,
-  roomNumber: `livingroom${index}`
-}));
+const [livingroomDetails, setLivingroomDetails] = useState<RoomDetails[]>([]);
+const [openLivingroom, setLivingroomOpen] = useState<boolean[]>([]);
+useEffect(() => {
+  const initialLivingroomDetails: RoomDetails[] = new Array(livingRooms).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `livingroom${index}`
+  }));
 
-const [livingroomDetails, setLivingroomDetails] = useState<RoomDetails[]>(initialLivingroomDetails);
-
-const [openLivingroom, setLivingroomOpen] = useState(Array(livingroomDetails.length).fill(false));
+  setLivingroomDetails(initialLivingroomDetails);
+  setLivingroomOpen(new Array(livingRooms).fill(false));
+}, [livingRooms]);
 
 // kitchens
-
-const initialKitchenDetails: RoomDetails[] = new Array(kitchens).fill(null).map((_, index) => ({
-  roomName: '',
-  floorName: null,
-  roomNumber: `kitchen${index}`
-}));
-
-const [kitchenDetails, setKitchenDetails] = useState<RoomDetails[]>(initialKitchenDetails);
+const [kitchenDetails, setKitchenDetails] = useState<RoomDetails[]>([]);
 const [openKitchen, setKitchenOpen] = useState(Array(kitchenDetails.length).fill(false));
+useEffect(() => {
+  const initialKitchenDetails: RoomDetails[] = new Array(kitchens).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `kitchen${index}`
+  }));
+  setKitchenDetails(initialKitchenDetails);
+  setKitchenOpen(new Array(kitchens).fill(false));
+}, [kitchens]);
+
 
 // family rooms
-const initialFamilyroomDetails: RoomDetails[] = new Array(familyRooms).fill(null).map((_, index) => ({
-  roomName: '',
-  floorName: null,
-  roomNumber: `familyroom${index}`
-}));
-
-const [familyroomDetails, setFamilyroomDetails] = useState<RoomDetails[]>(initialFamilyroomDetails);
+const [familyroomDetails, setFamilyroomDetails] = useState<RoomDetails[]>([]);
 const [openFamilyroom, setFamilyroomOpen] = useState(Array(familyroomDetails.length).fill(false));
+
+useEffect(() => {
+  const initialFamilyroomDetails: RoomDetails[] = new Array(familyRooms).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `familyroom${index}`
+  }));
+  setFamilyroomDetails(initialFamilyroomDetails);
+  setFamilyroomOpen(new Array(familyRooms).fill(false));
+}, [familyRooms]);
+
 
 
 // laundry rooms
-const initialLaundryroomDetails: RoomDetails[] = new Array(laundryRooms).fill(null).map((_, index) => ({
-  roomName: '',
-  floorName: null,
-  roomNumber: `laundryroom${index}`
-}));
-
-const [laundryroomDetails, setLaundryroomDetails] = useState<RoomDetails[]>(initialLaundryroomDetails);
+const [laundryroomDetails, setLaundryroomDetails] = useState<RoomDetails[]>([]);
 const [openLaundryroom, setLaundryroomOpen] = useState(Array(laundryroomDetails.length).fill(false));
 
-// foyer entrance
-const initialFoyerentranceDetails: RoomDetails[] = new Array(foyerEntrance).fill(null).map((_, index) => ({
-  roomName: '',
-  floorName: null,
-  roomNumber: `foyerentrance${index}`
-}));
+useEffect(() => {
+  const initialLaundryroomDetails: RoomDetails[] = new Array(laundryRooms).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `laundryroom${index}`
+  }));
+  setLaundryroomDetails(initialLaundryroomDetails);
+  setLaundryroomOpen(new Array(laundryRooms).fill(false));
+}, [laundryRooms]);
 
-const [foyerentranceDetails, setFoyerentranceDetails] = useState<RoomDetails[]>(initialFoyerentranceDetails);
+// foyer entrance
+
+const [foyerentranceDetails, setFoyerentranceDetails] = useState<RoomDetails[]>([]);
 const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDetails.length).fill(false));
 
+useEffect(() => {
+  const initialFoyerentranceDetails: RoomDetails[] = new Array(foyerEntrance).fill(null).map((_, index) => ({
+    roomName: '',
+    floorName: null,
+    roomNumber: `foyerentrance${index}`
+  }));
+  setFoyerentranceDetails(initialFoyerentranceDetails);
+  setFoyerentranceOpen(new Array(foyerEntrance).fill(false));
+}, [foyerEntrance]);
 
+
+const allRooms = [...bedroomDetails, ...bathDetails, ...livingroomDetails, ...kitchenDetails, ...familyroomDetails, ...laundryroomDetails, ...foyerentranceDetails];
+///////////////
   const handleNameChange = (index: number, text: string) => {
     let newRoomDetails = [...bedroomDetails];
     newRoomDetails[index].roomName = text;
@@ -231,11 +288,7 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
   //   // newRoomDetails[index].floorName = value;
   //   // setBedroomDetails(newRoomDetails);
   // };
-  const [testDropdownValues, setTestDropdownValues] = useState([
-    {label: 'Level 1', value: 'Level 1'},
-    {label: 'Level 2', value: 'Level 2'},
-    {label: 'Level 3', value: 'Level 3'},
-  ])
+
   
   const [selectedLanguage, setSelectedLanguage] = useState();
 
@@ -260,8 +313,13 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
 
     if (!result.canceled) {
       setPropertyImage(result.assets[0].uri);
+      store.setPropertyImage(result.assets[0].uri);
     }
   };
+
+
+  const addProperty = async () => {
+  }
 
   useEffect(() => {
     requestPermission();
@@ -270,14 +328,10 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
     const { control, handleSubmit, formState: { errors } } = useForm({
       
     });
-    useEffect(() => {
-      const newFloors = Array.from({ length: floorSliderValue }, (_, index) => ({ floorNumber: index + 1, floorName: '' }));
-      setFloors(newFloors);
-    }, [floorSliderValue]);
 
 
-    const floorsDropdownOptions = floors.map((floor, index) => ({ label: floor.floorName, value: floor.floorNumber }));
-  const [loadedFonts] = useFonts({
+
+    const [loadedFonts] = useFonts({
     Bold: require("../../assets/fonts/Roboto-Bold.ttf"),
     Regular: require("../../assets/fonts/Roboto-Regular.ttf"),
     Medium: require('../../assets/fonts/Roboto-Medium.ttf')
@@ -313,7 +367,7 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
   const handleInputChange = (index:any, event: any) => {
     // console.log(index, event.nativeEvent.text);
     const newFloors = [...floors];
-    newFloors[index].floorName = event.nativeEvent.text;
+    newFloors[index].label = event.nativeEvent.text;
     setFloors(newFloors);
   };
  
@@ -321,7 +375,12 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
   return (
     <View style={styles.container}>
       <View style={styles.upperContainer}>
-        <Text style={{fontFamily: 'Medium', fontSize:18, marginBottom: 10}}>Welcome Adam {store.firstName}</Text>
+        <View style={{flexDirection: 'row', marginTop: 40}}>
+          {/* <Pressable onPress={prevStep} style={{marginRight: 'auto'}}>
+          <MaterialCommunityIcons name="chevron-left" size={24} color="black" />
+          </Pressable> */}
+         <Text style={{fontFamily: 'Medium', fontSize:18, marginBottom: 10}}>Welcome {store.firstName}</Text>
+        </View>
         {propertyImage? 
         <Image source={{ uri: propertyImage }} style={{ width: 90, height: 90, borderRadius: 50, marginBottom: 10 }} />
         :
@@ -345,9 +404,25 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
           <Text 
           style={styles.text}
           >Name Property </Text>
-          <TextInputMUI variant="outlined" label="Property Name" style={{  width: 150, marginLeft: 'auto' }} />
-        </View>
+              <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+          <TextInputMUI  
+            variant="outlined" 
+            value={value} 
+            label="Property Name" 
+            onChangeText={(text) => {
+              onChange(text); // Update the form state
+              store.setPropertyName(text); // Update the Zustand store
+            }}
+            style={{  width: 150, marginLeft: 'auto' }} />
+           )}
+          name="propertyName"
+        />
+          </View>
+       
         <View style={{flexDirection:'row', alignItems: 'center'}}>
+
           <Text style={styles.text}>Add/Change Property Image </Text>
           <Pressable style={{marginLeft: 'auto'}} onPress={pickPropertyImage}>
             <MaterialCommunityIcons name="camera-plus" size={24} color="black" />
@@ -360,19 +435,26 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
   ) : step === 2 ? (
    
     <>
-        <View style={{width: '100%', backgroundColor: '#d1d1d1'}}>
-            <Text style={styles.mediumText}>Tell us about the floor layout</Text>
-           </View>
-           <ScrollView style={styles.lowerContainer}>
+       <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={{ flex: 1 }}
+  >
+    <View style={{ width: '100%', backgroundColor: '#d1d1d1' }}>
+      <Text style={styles.mediumText}>Tell us about the floor layout</Text>
+    </View>
+    <ScrollView
+      style={styles.lowerContainer}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
       <Pressable onPress={prevStep}>
-      <MaterialCommunityIcons name="chevron-left" size={24} color="black" />
+        <MaterialCommunityIcons name="chevron-left" size={24} color="black" />
       </Pressable>
 
       <Text style={[styles.text, {lineHeight: 23, marginBottom: 10}]}>
         How many floors does this property have including basements, crawl spaces and attics?
       </Text>
       
-      <View style={{flexDirection: 'row', alignItems:'center'}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <MaterialCommunityIcons name="layers-plus" size={24} color="black" />
         <Text style={[styles.text, {marginLeft: 15}]}>Floors/levels </Text>
       <Slider
@@ -388,32 +470,29 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
       />
        <Text>{floorSliderValue}</Text>
       </View>
-      <View style={{height: 2, backgroundColor: '#d1d1d1', marginVertical: 10}}/>
-      <Text style={[styles.text, {marginBottom: 15}]}>Name Each Floor</Text>
+      <View style={{ height: 2, backgroundColor: '#d1d1d1', marginVertical: 10 }} />
+      <Text style={[styles.text, { marginBottom: 15 }]}>Name Each Floor</Text>
 
-   {Array.from({length: floorSliderValue}, (_, index) => (
-    
-      <>
-      <Text style={styles.row}>{`Level ${index + 1}`}</Text>
-      <TextInputMUI 
-        key={index}
-        placeholder={`Level ${index + 1}`}
-        variant='outlined' 
-        style={{marginBottom: 10, width: 180,}} 
-        inputContainerStyle={{height: 50,  }}
-        inputStyle={{paddingBottom: 5, fontSize: 18}}
-        onChange={(event) => handleInputChange(`${index}`, event)}
-      />
-      
-      </>
-      )
-      )
-      }
+      {Array.from({ length: floorSliderValue }, (_, index) => (
+        <View key={index} style={{ marginBottom: 10 }}>
+          <Text style={styles.row}>{`Level ${index + 1}`}</Text>
+          <TextInputMUI
+            placeholder={`Level ${index + 1}`}
+            variant='outlined'
+            style={{ width: 180 }}
+            inputContainerStyle={{ height: 50 }}
+            inputStyle={{ paddingBottom: 5, fontSize: 18 }}
+            onChangeText={(text) => handleInputChange(`${index}`, text)}
+          />
+        </View>
+      ))}
           {/* <Button1 title="Print" onPress={() => console.log(floors)} /> */}
 
     <Button1 title="Next" onPress={nextStep} />
-    <View style={{marginBottom: 100}}/>
+    <View style={{marginBottom: keyboardActive? 1000 : 100}}/>
     </ScrollView>
+    </KeyboardAvoidingView>
+
   </>
   ) : step === 3 ? (
     <>
@@ -559,11 +638,13 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
      <View style={{width: '100%', backgroundColor: '#d1d1d1', zIndex: 1000}}>
        <Text style={styles.mediumText}>Name the rooms & assign them to floors</Text>
      </View>
-     <Button1 title="Print" onPress={() => console.log(bedroomDetails, bathDetails)} />
+     {/* <Button1 title="Print" onPress={() => console.log(floors)} /> */}
     <ScrollView nestedScrollEnabled={true} style={{padding: 20}}>
       <Pressable onPress={prevStep} style={{width: 30, height:30}}>
        <MaterialCommunityIcons name="chevron-left" size={24} color="black" />
       </Pressable>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+{/* bedroom */}
   {bedroomDetails.map((room, index) => (
   <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
     <TextInputMUI
@@ -582,8 +663,8 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
     style={{width: 150, borderRadius: 0, zIndex: open[index]? 300 : 0,}}
     dropDownDirection="TOP"
     dropDownContainerStyle={{ elevation: open[index]? 300 : 0, width: 150 }}
-    items={testDropdownValues}
-    setItems={setTestDropdownValues}
+    items={floors}
+    setItems={setFloors}
     setValue={() => handleFloorChange}
     onSelectItem={(item) => {
       handleFloorChange(index, `${item.value}`);
@@ -624,8 +705,8 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
         style={{width: 150, borderRadius: 0, zIndex: openBath[index]? 300 : 0,}}
         dropDownDirection="TOP"
         dropDownContainerStyle={{ elevation: openBath[index]? 300 : 0, width: 150 }}
-        items={testDropdownValues}
-        setItems={setTestDropdownValues}
+        items={floors}
+        setItems={setFloors}
         setValue={() => handleFloorChangeBath}
         onSelectItem={(item) => {
           handleFloorChangeBath(index, `${item.value}`);
@@ -662,8 +743,8 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
         style={{width: 150, borderRadius: 0, zIndex: openLivingroom[index]? 300 : 0,}}
         dropDownDirection="TOP"
         dropDownContainerStyle={{ elevation: openLivingroom[index]? 300 : 0, width: 150 }}
-        items={testDropdownValues}
-        setItems={setTestDropdownValues}
+        items={floors}
+        setItems={setFloors}
         setValue={() => handleFloorChangeLivingroom}
         onSelectItem={(item) => {
           handleFloorChangeLivingroom(index, `${item.value}`);
@@ -700,8 +781,8 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
         style={{width: 150, borderRadius: 0, zIndex: openKitchen[index]? 300 : 0,}}
         dropDownDirection="TOP"
         dropDownContainerStyle={{ elevation: openKitchen[index]? 300 : 0, width: 150 }}
-        items={testDropdownValues}
-        setItems={setTestDropdownValues}
+        items={floors}
+        setItems={setFloors}
         setValue={() => handleFloorChangeKitchen}
         onSelectItem={(item) => {
           handleFloorChangeKitchen(index, `${item.value}`);
@@ -730,29 +811,29 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
         inputContainerStyle={{height: 50,  }}
         inputStyle={{paddingBottom: 5, fontSize: 18}}
         style={{marginBottom: 10, width: 150,}} 
-        onChangeText={(text) => handleNameChangeBath(index, text)}
+        onChangeText={(text) => handleNameChangeFamilyroom(index, text)}
       />
   
     <View style={styles.dropdownContainer}>
       <DropDownPicker
-        style={{width: 150, borderRadius: 0, zIndex: openBath[index]? 300 : 0,}}
+        style={{width: 150, borderRadius: 0, zIndex: openFamilyroom[index]? 300 : 0,}}
         dropDownDirection="TOP"
-        dropDownContainerStyle={{ elevation: openBath[index]? 300 : 0, width: 150 }}
-        items={testDropdownValues}
-        setItems={setTestDropdownValues}
-        setValue={() => handleFloorChangeBath}
+        dropDownContainerStyle={{ elevation: openFamilyroom[index]? 300 : 0, width: 150 }}
+        items={floors}
+        setItems={setFloors}
+        setValue={() => handleFloorChangeFamilyroom}
         onSelectItem={(item) => {
-          handleFloorChangeBath(index, `${item.value}`);
+          handleFloorChangeFamilyroom(index, `${item.value}`);
         }}
         onChangeValue={(value) => {
           console.log(value);
         }}
         value={room.floorName}
-        open={openBath[index]}
+        open={openFamilyroom[index]}
         setOpen={(isOpen: any) => {
-          let newOpen = [...openBath];
+          let newOpen = [...openFamilyroom];
           newOpen[index] = isOpen;
-          setBathOpen(newOpen);
+          setFamilyroomOpen(newOpen);
         }}
       />
     </View>
@@ -760,60 +841,84 @@ const [openFoyerentrance, setFoyerentranceOpen] = useState(Array(foyerentranceDe
   ))}
 
 {/* LAUNDRY ROOM */}
-
-    {/* <View style={{width: 150,}}>  
-    <Picker
-    // selectedValue={bedroomDetails[index].floorName}
-    onValueChange={(value:any) => handleFloorChange(index, value)
-    }>
-      {testDropdownValues.map((floor, index) => ( 
-      <Picker.Item label={floor.label} value={floor.value} key={index} />
-      ))
-      }
-  </Picker>
-  </View> */}
-        {/* {Array.from({length: bedSliderValue}, (_, index) =>  { 
-          return (
-        <>
-         <View style={styles.row}>
-        <Text>{`Bed Room ${index + 1}`}</Text>
-        <View >
-        <TextInputMUI 
-          key={index}
-          variant='outlined' 
-          style={{marginBottom: 10, width: 180,}} 
-          inputContainerStyle={{height: 50,  }}
-          inputStyle={{paddingBottom: 5, fontSize: 18}}
-          
-          onChange={(event) => handleInputChangeRooms(`${index}`, event)}
-        />
-        </View>
-        <DropDownPicker
-                open={open[index]}
-                value={values[index]}}
-                items={floorsDropdownOptions}
-                // // setOpen={(isOpen) => {
-                // //   const newOpen = [...open];
-                // //   newOpen[index] = isOpen;
-                // //   setOpen(newOpen);
-                // // }}
-                // setValue={(value:any )=> {
-                //   const newValues = [...values];
-                //   newValues[index] = value;
-                //   setValues(newValues);
-                // }}
-                // setItems={handleInputChange}
-                // style={{borderRadius: 0}}
-              />
-        </View>
-        </>
-        )}
-        )
-        } */}
-
+{laundryroomDetails.map((room, index) => (
+    <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
+      <TextInputMUI
+      variant='outlined' 
+        placeholder={`Laundryroom ${index + 1} `}
+        inputContainerStyle={{height: 50,  }}
+        inputStyle={{paddingBottom: 5, fontSize: 18}}
+        style={{marginBottom: 10, width: 150,}} 
+        onChangeText={(text) => handleNameChangeLaundryroom(index, text)}
+      />
   
-    <Text>Step 4</Text>
-    <Button1 title="Next" onPress={nextStep} />
+    <View style={styles.dropdownContainer}>
+      <DropDownPicker
+        style={{width: 150, borderRadius: 0, zIndex: openLaundryroom[index]? 300 : 0,}}
+        dropDownDirection="TOP"
+        dropDownContainerStyle={{ elevation: openLaundryroom[index]? 300 : 0, width: 150 }}
+        items={floors}
+        setItems={setFloors}
+        setValue={() => handleFloorChangeLaundryroom}
+        onSelectItem={(item) => {
+          handleFloorChangeLaundryroom(index, `${item.value}`);
+        }}
+        onChangeValue={(value) => {
+          console.log(value);
+        }}
+        value={room.floorName}
+        open={openLaundryroom[index]}
+        setOpen={(isOpen: any) => {
+          let newOpen = [...openLaundryroom];
+          newOpen[index] = isOpen;
+          setLaundryroomOpen(newOpen);
+        }}
+      />
+    </View>
+  </View>
+  ))}
+ 
+{/* FOYER ENTRANCE */}
+{foyerentranceDetails.map((room, index) => (
+    <View style={[styles.row, { justifyContent: 'space-between',  }]} key={index}>
+      <TextInputMUI
+      variant='outlined' 
+        placeholder={`Foyer/entrance ${index + 1} `}
+        inputContainerStyle={{height: 50,  }}
+        inputStyle={{paddingBottom: 5, fontSize: 18}}
+        style={{marginBottom: 10, width: 150,}} 
+        onChangeText={(text) => handleNameChangeFoyerentrance(index, text)}
+      />
+  
+    <View style={styles.dropdownContainer}>
+      <DropDownPicker
+        style={{width: 150, borderRadius: 0, zIndex: openFoyerentrance[index]? 300 : 0,}}
+        dropDownDirection="TOP"
+        dropDownContainerStyle={{ elevation: openFoyerentrance[index]? 300 : 0, width: 150 }}
+        items={floors}
+        setItems={setFloors}
+        setValue={() => handleFloorChangeFoyerentrance}
+        onSelectItem={(item) => {
+          handleFloorChangeFoyerentrance(index, `${item.value}`);
+        }}
+        onChangeValue={(value) => {
+          console.log(value);
+        }}
+        value={room.floorName}
+        open={openFoyerentrance[index]}
+        setOpen={(isOpen: any) => {
+          let newOpen = [...openFoyerentrance];
+          newOpen[index] = isOpen;
+          setFoyerentranceOpen(newOpen);
+        }}
+      />
+    </View>
+  </View>
+  ))}
+
+</KeyboardAvoidingView>
+    <Button1 title="Next" onPress={() => {console.log(allRooms); navigation.navigate('UserSetup')}} />
+    <View style={{marginBottom: keyboardActive? 1000 : 100}}/>
     </ScrollView>
   </>
   )}
@@ -835,6 +940,7 @@ const styles = StyleSheet.create({
   justifyContent: 'center',
   alignItems: 'center',
   padding: 20,
+  // marginTop: -100
   },
   lowerContainer: {
     flex: 1,

@@ -2,6 +2,7 @@ import { floor } from 'react-native-reanimated'
 import { create } from 'zustand'
 
 interface SignUpStore {
+  authenticated: boolean
   floors: number
   beds: number
   baths: number
@@ -9,6 +10,13 @@ interface SignUpStore {
   primaryResidence: boolean
   fullAddress: string
   firstName: string
+  userImage: string
+  propertyImage: string
+  propertyName: string
+  setPropertyName: (propertyName: string) => void
+  setUserImage: (userImage: string) => void
+  setPropertyImage: (propertyImage: string) => void
+  setAuthenticated: (authenticated: boolean) => void
   setFirstName: (firstName: string) => void
   setFullAddress: (fullAddress: string) => void
   setCurrentOwner: (currentOwner: boolean) => void
@@ -24,6 +32,7 @@ interface SignUpStore {
 }
 
 const useSignUpStore = create<SignUpStore>((set) => ({
+  authenticated: false,
   floors: 1,
   beds: 1,
   baths: 1,
@@ -33,6 +42,29 @@ const useSignUpStore = create<SignUpStore>((set) => ({
   primarySearchResult: '',
   secondarySearchResult: '',
   firstName: '',
+  userImage: '',
+  propertyImage: '',
+  propertyName: '',
+  setPropertyName(propertyName: string) {
+    set((state) => ({
+      ...state,
+      propertyName: propertyName,
+    }))
+  },
+  setUserImage(userImage: string) {
+    set((state) => ({
+      ...state,
+      userImage: userImage,
+    }))
+  },
+  setPropertyImage(propertyImage: string) {
+    set((state) => ({
+      ...state,
+      propertyImage: propertyImage,
+    }))
+  },
+
+  setAuthenticated: () => set({ authenticated: true }),
   setFirstName(firstName: string) {
     set((state) => ({
       ...state,

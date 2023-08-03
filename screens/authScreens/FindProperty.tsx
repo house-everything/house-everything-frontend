@@ -7,13 +7,17 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Header from '../../components/navigation/Header';
 import { TextInput } from "@react-native-material/core";
 import Button1 from '../../components/Button1';
-
+import useSignUpStore from '../../stateStores/SignUpStore';
 const FindProperty = ({ navigation } : any) => {
-
+  const signUpStore = useSignUpStore();
   const store = useSearchStore();
   const [address, setAddress] = useState('')
   //Google Places Autocomplete not working with typescript
   const ref = useRef<any>(null);
+
+  const submit = () => {
+    signUpStore.setAuthenticated(true);
+  }
 
   useEffect(() => {
     ref.current?.setAddressText('');
@@ -73,8 +77,10 @@ const FindProperty = ({ navigation } : any) => {
   
       </View>
       <View style={{padding: 20, marginTop: 100}}>
-        {/* { <Text style={{marginTop: 100, textAlign: 'center'}}>{store.primarySearchResult}</Text>} */}
-        <Button1 title='press' onPress={() => navigation.navigate('PropertySearchResult')} />
+        {/* { <Text style={{marginTop: 100, textAlign: 'center'}}>{signUpStore.authenticated? 'true':'false'}</Text>} */}
+        {/* <Button1 title='press' onPress={submit} /> */}
+
+        {/* <Button1 title='press' onPress={() => navigation.navigate('PropertySearchResult')} /> */}
       </View>
    
     </SafeAreaView>

@@ -13,6 +13,7 @@ import useSignUpStore from '../../stateStores/SignUpStore';
 import Checkbox from 'expo-checkbox';
 import { TextInput as TextInputMUI } from "@react-native-material/core";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Button1 from '../../components/Button1';
 
 // import SmoothPinCodeInput from 4'react-native-smooth-pincode-input';
 
@@ -90,28 +91,34 @@ const SignUp = ({navigation}: any) => {
 
   const [email, setEmail] = useState('test@gmail.com');
   const [username, setUsername] = useState('username');
-  async function confirmCode(pin: string) {
-    try {
-      console.log(pin)
-      await confirm.confirm(pin);
-      const user: any = auth().currentUser;
 
-      await user.updateEmail(email); // set user's email
-      await user.updateProfile({
-        displayName: username, // set "display name" as the user's username
-      });
-      try {
-        await AsyncStorage.setItem('UID', user.uid);
-      } catch (e) {
-      }
+  async function confirmCode(pin: string) {
+
+    //commented out for testing, uncomment for phone auth
+    // try {
+    //   console.log(pin)
+    //   await confirm.confirm(pin);
+    //   const user: any = auth().currentUser;
+
+    //   await user.updateEmail(email); // set user's email
+    //   await user.updateProfile({
+    //     displayName: username, // set "display name" as the user's username
+    //   });
+    //   try {
+    //     await AsyncStorage.setItem('UID', user.uid);
+    //   } catch (e) {
+    //   }
+
+      setModalVisible(!modalVisible)
       navigation.navigate('PropertySetup');
 
-    } catch (error) {
-      console.log('Invalid code.');
-    }
+    // } catch (error) {
+    //   console.log('Invalid code.');
+    // }
+
   }
 
-  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
+  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormValues>({
     resolver: yupResolver(schema),
   });
   const onSubmit = (data: FormValues) => {
@@ -179,15 +186,15 @@ const SignUp = ({navigation}: any) => {
       ))}
       
       </View>
-      <Button title="Confirm Code" onPress={() => confirmCode(pin.join(''))} />    
-          <TouchableHighlight
+      <Button1 title="Confirm Code" onPress={() => confirmCode(pin.join(''))} />    
+          {/* <TouchableHighlight
             style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
             onPress={() => {
               setModalVisible(!modalVisible);
             }}
           >
             <Text style={styles.textStyle}>Hide Modal</Text>
-          </TouchableHighlight>
+          </TouchableHighlight> */}
         </View>
       </Modal>
       {/* <Header /> */}
@@ -197,7 +204,7 @@ const SignUp = ({navigation}: any) => {
 
       </View>
       <View style={styles.formContainer}>
-<Button onPress={getData} title="Get Data" />
+{/* <Button onPress={getData} title="Get Data" /> */}
       <Text style={{marginTop: 10, marginBottom: 20, fontSize: 18, fontWeight: 'bold'}}>Verify ownership & set-up account</Text>
       <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
         <View>
@@ -245,15 +252,16 @@ const SignUp = ({navigation}: any) => {
       )}
       name="email"
     />
-      <View style={{flexDirection: 'row', marginRight: 20}}>
+      <View style={{flexDirection: 'row', marginRight: 20, }}>
         <View 
         // style={{width: 20, height: 20,  borderWidth: 1, marginRight: 10}}
         >
         <Checkbox
           style={{marginRight: 10}}
           value={isChecked}
+          disabled={!isValid}
           onValueChange={setChecked}
-          color={isChecked ? '#4630EB' : undefined}
+          color={isValid ? '#4630EB' : undefined}
         />
       {/* <Checkbox
       
@@ -276,8 +284,13 @@ const SignUp = ({navigation}: any) => {
         <Text style={[styles.textStyle]}>Show Modal</Text>
       </TouchableHighlight> */}
       <Pressable 
-      style={styles.button}
-      onPress={handleSubmit(onSubmit) }
+      style={[styles.button, {backgroundColor: isChecked ? '#7C106B' : '#d1d1d1'}]}
+      onPress={
+        // () => {
+        // if (isChecked)
+        handleSubmit(onSubmit)
+      // }
+    }
       // onPress={() => signInWithPhoneNumber('+1 845-705-5261')}
       >
         <Text style={styles.buttonText}>Verify</Text>
@@ -408,7 +421,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     position: 'absolute',
     width: Dimensions.get('window').width,
-    height: 600,
+    height: '90%',
   },
   openButton: {
     backgroundColor: '#7C106B',

@@ -58,7 +58,7 @@ const PropertySearchResult = ({ navigation } : any) => {
 
       {/* <Text>PropertySearchResult</Text> */}
       <View style={{ backgroundColor: '#6e869d', height: 200}}>
-        {!confirm && <Text style={{fontSize: 20, fontWeight: 'bold', marginTop: 50, padding: 20}}>{propertyDetails.map((property: any) => property.address.oneLine)}</Text>}
+        {!confirm && <Text style={{fontSize: 20, fontWeight: 'bold', marginTop: 'auto', marginBottom: 'auto', padding: 20, color: 'white'}}>{propertyDetails.map((property: any) => property.address.oneLine)}</Text>}
       </View>
 
       {/* <Button title="Go back" onPress={() =>navigation.navigate('SignUp')} />
@@ -135,7 +135,7 @@ const PropertySearchResult = ({ navigation } : any) => {
       </TouchableOpacity>
         </View>
         <Button1  title='Claim it'
-                 onPress={() => navigation.navigate('PropertySetup')} 
+                 onPress={() => navigation.navigate('SignUp')} 
 
         //  onPress={() => navigation.navigate('SignUp')} 
          />

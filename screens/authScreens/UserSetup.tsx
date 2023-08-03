@@ -51,6 +51,7 @@ const UserSetup = () => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      store.setUserImage(result.assets[0].uri);
     }
   };
 const [homes, setHomes] = useState<any>([])
@@ -69,6 +70,11 @@ const [homes, setHomes] = useState<any>([])
       setSelectedInterests([...selectedInterests, interest]);
     }
   };
+
+  const setAuth = useSignUpStore((state) => state.setAuthenticated);
+  const submitForm = () => {
+    store.setAuthenticated(true);
+  }
   const [loadedFonts] = useFonts({
     Bold: require("../../assets/fonts/Roboto-Bold.ttf"),
     Regular: require("../../assets/fonts/Roboto-Regular.ttf"),
@@ -80,7 +86,8 @@ const [homes, setHomes] = useState<any>([])
   return (
     <View style={styles.container}>
       <View style={styles.upperContainer}>
-        <Text style={{fontFamily: 'Medium', fontSize:18, marginBottom: 10}}>Welcome,{store.firstName}</Text>
+        <Text style={{fontFamily: 'Medium', fontSize:18, marginBottom: 10}}>Welcome,{store.firstName} {store.authenticated? 'false':
+        'treue'}</Text>
         {image? 
         <Image source={{ uri: image }} style={{ width: 90, height: 90, borderRadius: 50, marginBottom: 10 }} />
         :
@@ -200,7 +207,7 @@ const [homes, setHomes] = useState<any>([])
       </TouchableOpacity>
     ))}
     </View>
-    <Button1 title="Finish" onPress={() => console.log('finshed')} />
+    <Button1 title="Finish" onPress={() => submitForm()} />
     </ScrollView>
   </>
   }

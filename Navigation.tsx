@@ -31,7 +31,7 @@ import ByRoomsAndFloors from './screens/detailsScreens/ByRoomsAndFloors';
 import ConfirmClaim from './screens/authScreens/ConfirmClaim';
 import PropertySetup from './screens/authScreens/PropertySetup';
 import UserSetup from './screens/authScreens/UserSetup';
-
+import useSignUpStore from './stateStores/SignUpStore';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,17 +74,20 @@ function MyDrawer() {
 const BottomTabNavigator = () => (
   <Tab.Navigator
   screenOptions={{
-    tabBarStyle: { height: 80, paddingBottom: 10},
+    tabBarStyle: { height: 80, paddingBottom: 15},
+    tabBarActiveTintColor: '#711e68', // color for the active tab
+    tabBarInactiveTintColor: '#6e869d', // color for the inactive tabs
   }}
   >
     {/* <Tab.Screen options={{ headerShown: false }} name="FindProperty" component={FindProperty} /> */}
     <Tab.Screen 
       options={{ 
-        headerShown: false,   
+        headerShown: false,  
+       
         tabBarLabel: 'Portfolio',
         tabBarLabelStyle: {fontSize: 15},
         tabBarIcon: ({ color, size }) => (
-          <MaterialIcons name="house" size={30} color="black" />), 
+          <MaterialIcons name="house" size={30} color={color} />), 
       }} 
       name="Portfolio" 
       component={Portfolio} 
@@ -96,7 +99,7 @@ const BottomTabNavigator = () => (
         tabBarLabel: 'Details',
         tabBarLabelStyle: {fontSize: 15},
         tabBarIcon: ({ color, size }) => (
-          <MaterialCommunityIcons name="file-plus" size={30} color="black" />), 
+          <MaterialCommunityIcons name="file-plus" size={30} color={color} />), 
       }} 
       name="Details" 
       component={DetailsStackNavigator} 
@@ -108,7 +111,7 @@ const BottomTabNavigator = () => (
         tabBarLabel: 'Manage',
         tabBarLabelStyle: {fontSize: 15},
         tabBarIcon: ({ color, size }) => (
-          <MaterialCommunityIcons name="calendar-month" size={30} color="black" />
+          <MaterialCommunityIcons name="calendar-month" size={30} color={color}  />
         ), 
       }} 
       name="Manage" 
@@ -121,7 +124,7 @@ const BottomTabNavigator = () => (
         tabBarLabel: 'Report',
         tabBarLabelStyle: {fontSize: 15},
         tabBarIcon: ({ color, size }) => (
-          <MaterialCommunityIcons name="file-document" size={30} color="black" />
+          <MaterialCommunityIcons name="file-document" size={30} color={color}  />
         ), 
       }} 
       name="Report" 
@@ -134,7 +137,7 @@ const BottomTabNavigator = () => (
         tabBarLabel: 'Alerts',
         tabBarLabelStyle: {fontSize: 15},
         tabBarIcon: ({ color, size }) => (
-          <Foundation name="alert" size={24} color="black" />          ), 
+          <Foundation name="alert" size={24} color={color}  />          ), 
       }} 
       name="Alerts" 
       component={Alerts} 
@@ -193,7 +196,8 @@ const AuthenticationStack = () => {
 }
 
 const Navigation = () => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const store = useSignUpStore();
+  const [isAuthenticated, setIsAuthenticated] = React.useState(store.authenticated);
   const [appIsReady, setAppIsReady] = React.useState(false);
 
   React.useEffect(() => {
@@ -220,7 +224,7 @@ const Navigation = () => {
     
     // : <Text>App is ready!</Text>
     // } */}
-      {isAuthenticated ? <HomeStack /> : <AuthenticationStack /> } 
+      {store.authenticated ? <HomeStack /> : <AuthenticationStack /> } 
     </>
   )
 }
